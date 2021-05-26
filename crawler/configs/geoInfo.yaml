@@ -1,0 +1,51 @@
+HOST:
+    GERMANY:
+        ISO2: 'DE'
+        LANGS: ['de']
+    SWEDEN:
+        ISO2: 'SE'
+        LANGS: ['sv', 'fi']
+    FRANCE:
+        ISO2: 'FR'
+        LANGS: ['fr']
+    ITALY:
+        ISO2: 'IT'
+        LANGS: ['it']
+    GREECE:
+        ISO2: 'GR'
+        LANGS: ['el']
+    SPAIN:
+        ISO2: 'ES'
+        LANGS: ['es']
+    AUSTRIA:
+        ISO2: 'AT'
+        LANGS: ['de']
+    UK:
+        ISO2: 'GB'
+        LANGS: ['en']
+    HUNGARIAN:
+        ISO2: 'HU'
+        LANGS: ['hu']
+    SWITZERLAND:
+        ISO2: 'CH'
+        LANGS: ['de', 'fr', 'it']
+    POLAND:
+        ISO2: 'PL'
+        LANGS: ['pl']
+    NETHERLANDS:
+        ISO2: 'NL'
+        LANGS: ['nl', 'en']
+
+SOURCE:
+    MALI:
+        ISO2: 'ML'
+        LANGS: ["fr", "bm"]
+    AFGHANISTAN:
+        ISO2: 'AF'
+        LANGS: ["fa", "ps", "tk", "ur"]
+    NIGERIA:
+        ISO2: 'NG'
+        LANGS: ["en", "ha", "ig", "yo", "ff"]
+    VENEZUELA:
+        ISO2: 'VE'
+        LANGS: ["es"]

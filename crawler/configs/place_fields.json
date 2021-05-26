@@ -1,0 +1,10 @@
+[
+  "full_name",
+  "id",
+  "contained_within",
+  "country",
+  "country_code",
+  "geo",
+  "name",
+  "place_type"
+]

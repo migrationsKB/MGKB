@@ -1,0 +1,15 @@
+[
+  "id",
+  "name",
+  "username",
+  "created_at",
+  "description",
+  "entities",
+  "location",
+  "pinned_tweet_id",
+  "profile_image_url",
+  "public_metrics",
+  "url",
+  "verified",
+  "withheld"
+]

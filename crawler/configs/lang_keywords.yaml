@@ -1,0 +1,64 @@
+fr: ["enfui", "r\u00e9fugi\u00e9-e-s", "exil\u00e9s", "refugi\u00e9",
+     "apatride", "enfuit", "exil", "emprisonn\u00e9", "expulsable",
+     "ressortissant", "pers\u00e9cut\u00e9", "immigr\u00e9e",
+     "\u00e9migrant", "r\u00e9fugier", "sans-papier", "refuge",
+     "prisonnier", "migrants", "r\u00e9fugie", "r\u00e9fugi\u00e9e",
+     "r\u00e9fugi\u00e9s", "r\u00e9sident", "refugi\u00e9s",
+     "rapatri\u00e9", "r\u00e9fugi\u00e9es", "asile", "exil\u00e9e",
+     "R\u00e9fugi\u00e9", "exfiltr\u00e9", "rescap\u00e9", "fui",
+     "\u00e9vad\u00e9", "refugie", "expuls\u00e9", "chass\u00e9",
+     "d\u00e9serteur", "\u00e9migr\u00e9", "fugitif", "fuit",
+     "refugi\u00e9e", "refugi\u00e9es", "migrant", "expatri\u00e9",
+     "fuyant", "immigrant", "exil\u00e9", "immigr\u00e9", "incarc\u00e9r\u00e9"]
+de: [ 'Flüchtling', 'Einwander', 'Zuwander', 'Immigrant', 'Asyl',
+      'flüchtlingen', 'flüchtlinge', 'asylbewerber', 'einwanderer',
+      'straftäter', 'vergewaltiger', 'vergewaltigung', 'asylanten',
+      'bettler',
+      'sozialarbeiter', 'migranten', 'mitbürger', 'aussteiger',
+      'rassisten', 'einwanderung', 'auswanderer', 'rassist',
+      'massenmörder', 'moslem', 'gastarbeiter', 'hetzer', 'polizist',
+      'islamisten', 'demonstranten', 'migrant', 'Asylforderer', 'abschiebung',
+      'Kriegsflüchtling', 'staatsbürger', 'arbeitssuchender', 'schmarotzer',
+      'Wirtschaftsflüchtling', 'vergewaltigungen', 'verbrecher',
+      'asylsuchende', 'rechtsstaat', 'landsleute', 'leistungsträger',
+      'ausländern', 'bürgerkrieg', 'muslime', 'staatsanwalt', 'abschaum',
+      'Asylant', 'kriegsverbrechen' ]
+en: [ 'immigrant', 'immigrants',  'refugee', 'refugees','asylum',
+      'migrant', 'migrants', 'internally displaced', 'UNHCR', 'asylee',
+      'asylees', 'Asylee',  'resettled', 'resettlements',
+      'immigration', 'Ateh', 're settlement', 'resettle', 'resettles',
+      'Dadaab', 'statelessness', 'Hagadera' , 'Domiz',
+      'émigré', 'exile', 'displaced person', 'deserter', 'pariah', 'pariahs' ]
+it: [ 'profuga', 'profugo', 'immigrata', 'immigrato',
+      'migrante', 'rifugiato', 'profughi', 'esule', 'immigrante',
+      'straniero', 'emigrante', 'extracomunitario', 'profughe', 'scafista', 'migranti',
+      'rifugiati', 'clandestino', 'emigrato', 'espariato', 'rimpatriato', 'immigrati',
+      'rifiugiato', 'magrebino', 'fuggito', 'Profughi', 'deportato', 'rimpatrio',  'asilo',
+      'deporta', 'fuggiasco', '#portiaperti', '#portichiusi', '#iussoli', 'lampedusa',
+      'sbarchi', 'sbarco' ]
+es: ['asilada', 'asilados', 'refugiados', 'indocumentado', 'refugiad',
+     'refugio', 'migrante', 'exiliada', 'refugiado', 'asilarse',
+     'refugió', 'refugiada', 'repatriado', 'prisionero', 'guarecido',
+     'acogido', 'recluido', 'autoexiliado', 'refugiados-', 'huído',
+     'exilado', 'refugia', 'fugitivo', 'asilo', 'refugiadas', 'exiliado',
+     'reasentado', 'emigrante', 'inmigrante', 'deportado', 'refugiadxs',
+     'refugiar', 'huido', 'refugiarse', 'asilado', 'exilio', 'emigrado',
+     'expatriado', 'inmigrado']
+pl: ['dżihadysta', 'azylanta', 'bezpaństwowiec', 'ekstremista', 'afrykanin',
+     'uchodźców', 'uchodźcę', 'pakistańczyk', 'cudzoziemiec', 'immigrant',
+     'irańczyk', 'imigrant', 'neonazista', 'separatysta', 'chrześcijanin',
+     'uchodźca', 'europejczyk', 'imigracyjny', 'żydek', 'muzułmanin',
+     'uciekinier', 'emigrantem', 'obywatel', 'somalijczyk', 'obcokrajowiec',
+     'imigranta', 'imigrancie', 'migrant', 'czarnuch', 'uchodźcy',
+     'palestyńczyk', 'terrorysta', 'afgańczyk', 'syryjczyk', 'czarny',
+     'azylant', 'imigrancki', 'imigrantka', 'żyd', 'uchodźctwa', 'migranta',
+     'reemigrant', 'uchodźcą', 'uchodźczy', 'imigrantem', 'emigrant',
+     'imigranci', 'irakijczyk', 'albańczyk', 'islamista', 'ciapaty ',
+     'imigrantów', 'murzyn']
+el: [ 'πρόσφυγας', 'μετανάστης' ]
+sv: [ 'flykting','invandrare','immigrant' ]
+hu: [ 'menekült', 'bevándorló' ]
+fi: [ 'pakolainen', 'siirtolainen' ]
+fa: [ "پناهجو", "پناهنده" ]
+ur: [ "پناہ گزین", "مہاجر" ]
+ps: [ "کډوال" ]
