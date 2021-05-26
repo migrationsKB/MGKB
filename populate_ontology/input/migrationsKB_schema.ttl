@@ -1,0 +1,533 @@
+@prefix : <https://migrationsKB.github.io/MGKB#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix nee: <http://www.ics.forth.gr/isl/oae/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix wna: <http://www.gsi.dit.upm.es/ontologies/wnaffect/ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix mgkb: <https://migrationsKB.github.io/MGKB#> .
+@prefix onyx: <http://www.gsi.dit.upm.es/ontologies/onyx/ns#> .
+@prefix prov: <https://www.w3.org/TR/prov-o/#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sioc: <http://rdfs.org/sioc/ns#> .
+@prefix schema: <http://schema.org/> .
+@prefix sioc_t: <http://rdfs.org/sioc/types#> .
+@prefix fibo-fnd-dt-fd: <https://spec.edmcouncil.org/fibo/ontology/FND/DatesAndTimes/FinancialDates/> .
+@prefix fibo-ind-ei-ei: <https://spec.edmcouncil.org/fibo/ontology/IND/EconomicIndicators/EconomicIndicators/> .
+@prefix fibo-fnd-arr-doc: <https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Documents/> .
+@prefix fibo-fnd-arr-rep: <https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Reporting/> .
+@prefix fibo-fnd-rel-rel: <https://spec.edmcouncil.org/fibo/ontology/FND/Relations/Relations/> .
+@prefix fibo-fnd-utl-alx: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/Analytics/> .
+@prefix fibo-fnd-arr-asmt: <https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Assessments/> .
+@base <https://migrationsKB.github.io/MGKB#> .
+
+<https://migrationsKB.github.io/MGKB#> rdf:type owl:Ontology .
+
+#################################################################
+#    Datatypes
+#################################################################
+
+###  http://www.w3.org/2000/01/rdf-schema#Resource
+rdfs:Resource rdf:type rdfs:Datatype .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://rdfs.org/sioc/ns#has_creator
+sioc:has_creator rdf:type owl:ObjectProperty ;
+                 rdfs:domain sioc:Post ;
+                 rdfs:range sioc:UserAccount ;
+                 rdfs:comment "Defines the creator of the Tweet." .
+
+
+###  http://schema.org/interactionStatistics
+schema:interactionStatistics rdf:type owl:ObjectProperty ;
+                             rdfs:domain sioc:Post ;
+                             rdfs:range schema:InteractionCounter ;
+                             rdfs:comment """[The number of interactions for the CreativeWork using the WebSite or SoftwareApplication. The most specific child type of InteractionCounter should be used.]
+
+A tweet has interactionStatistics InteractionCounter.""" .
+
+
+###  http://schema.org/interactionType
+schema:interactionType rdf:type owl:ObjectProperty ;
+                       rdfs:domain schema:InteractionCounter ;
+                       rdfs:range schema:Action ;
+                       rdfs:comment "Defines the type of an interaction counter of a Tweet." .
+
+
+###  http://schema.org/location
+schema:location rdf:type owl:ObjectProperty ;
+                rdfs:domain sioc:Post ;
+                rdfs:range schema:Place ;
+                rdfs:comment "Defines the geo information of a Tweet." .
+
+
+###  http://schema.org/mentions
+schema:mentions rdf:type owl:ObjectProperty ;
+                rdfs:domain sioc:Post ;
+                rdfs:range sioc:UserAccount ,
+                           sioc_t:Tag ,
+                           nee:Entity ;
+                rdfs:comment "Defines the entity mentions, user mentions, and hashtags." .
+
+
+###  http://www.gsi.dit.upm.es/ontologies/onyx/ns#hasEmotion
+onyx:hasEmotion rdf:type owl:ObjectProperty ;
+                rdfs:domain onyx:EmotionSet ;
+                rdfs:range onyx:Emotion ;
+                rdfs:comment "Used to express the individual emotions within an EmotionSet." .
+
+
+###  http://www.gsi.dit.upm.es/ontologies/onyx/ns#hasEmotionCategory
+onyx:hasEmotionCategory rdf:type owl:ObjectProperty ;
+                        rdfs:domain onyx:Emotion ;
+                        rdfs:range onyx:EmotionCategory ;
+                        rdfs:comment "Value that represents the type of emotion" .
+
+
+###  http://www.gsi.dit.upm.es/ontologies/onyx/ns#hasEmotionSet
+onyx:hasEmotionSet rdf:type owl:ObjectProperty ;
+                   rdfs:domain sioc:Post ;
+                   rdfs:range onyx:EmotionSet ;
+                   rdfs:comment "Indicates that a certain text has a subjective set of emotions expressed in it." .
+
+
+###  http://www.ics.forth.gr/isl/oae/core#hasMatchedURI
+nee:hasMatchedURI rdf:type owl:ObjectProperty ;
+                  rdfs:domain nee:Entity ;
+                  rdfs:range rdfs:Resource ;
+                  rdfs:comment "The URI of a detected Entity in a Tweet." .
+
+
+###  http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+rdf:type rdf:type owl:ObjectProperty ;
+         rdfs:domain mgkb:EconomicIndicators ;
+         rdfs:range <http://www.w3.org/ns/prov#Entity> ;
+         rdfs:comment "Defines the type of economic indicators." .
+
+
+###  http://www.w3.org/ns/prov#wasAssociatedWith
+<http://www.w3.org/ns/prov#wasAssociatedWith> rdf:type owl:ObjectProperty ;
+                                              rdfs:domain fibo-fnd-arr-asmt:AssessmentActivity ;
+                                              rdfs:range <http://www.w3.org/ns/prov#Organization> ;
+                                              rdfs:comment "An activity association is an assignment of responsibility to an agent for an activity, indicating that the agent had a role in the activity. It further allows for a plan to be specified, which is the plan intended by the agent to achieve some goals in the context of this activity." .
+
+
+###  http://www.w3.org/ns/prov#wasGeneratedBy
+<http://www.w3.org/ns/prov#wasGeneratedBy> rdf:type owl:ObjectProperty ;
+                                           rdfs:domain mgkb:EconomicIndicators ;
+                                           rdfs:range fibo-fnd-arr-asmt:AssessmentActivity ;
+                                           rdfs:comment "An economic indicator was generated by an assessment activity from an organization." .
+
+
+###  https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Reporting/hasReportDate
+fibo-fnd-arr-rep:hasReportDate rdf:type owl:ObjectProperty ;
+                               rdfs:domain mgkb:TotalUnemploymentRate ,
+                                           mgkb:YouthUnemploymentRate ,
+                                           fibo-ind-ei-ei:GrossDomesticProduct ;
+                               rdfs:range fibo-fnd-dt-fd:ExplicitDate ;
+                               rdfs:comment "The report date of an entity resulted from assessment activity of an organization, such as the last update date of GDPR in eurostat." .
+
+
+###  https://spec.edmcouncil.org/fibo/ontology/FND/Relations/Relations/isCharacterizedBy
+fibo-fnd-rel-rel:isCharacterizedBy rdf:type owl:ObjectProperty ;
+                                   rdfs:domain sioc:Post ;
+                                   rdfs:range fibo-ind-ei-ei:GrossDomesticProduct ,
+                                              fibo-ind-ei-ei:UnemploymentRate ;
+                                   rdfs:comment "A tweet is characterized by the economic indicators." .
+
+
+###  https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/Analytics/hasArgument
+fibo-fnd-utl-alx:hasArgument rdf:type owl:ObjectProperty ;
+                             rdfs:domain mgkb:TotalUnemploymentRate ,
+                                         mgkb:YouthUnemploymentRate ;
+                             rdfs:range fibo-ind-ei-ei:UnemployedPopulation ;
+                             rdfs:comment "Indicates a specific input to a function, formula or expression, also known as an independent variable" .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://purl.org/dc/elements/1.1/created
+dc:created rdf:type owl:DatatypeProperty ;
+           rdfs:domain sioc:Post ;
+           rdfs:range rdfs:Literal ;
+           rdfs:comment "the date when the data is created" .
+
+
+###  http://purl.org/dc/elements/1.1/date
+dc:date rdf:type owl:DatatypeProperty ;
+        rdfs:domain mgkb:TotalUnemploymentRate ,
+                    mgkb:YouthUnemploymentRate ,
+                    fibo-ind-ei-ei:GrossDomesticProduct ;
+        rdfs:range rdfs:Literal ;
+        rdfs:comment "date" .
+
+
+###  http://purl.org/dc/elements/1.1/subject
+dc:subject rdf:type owl:DatatypeProperty ;
+           rdfs:domain sioc:Post ;
+           rdfs:range rdfs:Literal ;
+           rdfs:comment "The top topic of the tweets resulted from topic modeling." .
+
+
+###  http://rdfs.org/sioc/ns#id
+sioc:id rdf:type owl:DatatypeProperty ;
+        rdfs:domain sioc:Post ,
+                    sioc:UserAccount ;
+        rdfs:range rdfs:Literal ;
+        rdfs:comment "The id of a Tweet or the encrypted id of a user account." .
+
+
+###  http://rdfs.org/sioc/ns#name
+sioc:name rdf:type owl:DatatypeProperty ;
+          rdfs:domain sioc:UserAccount ,
+                      schema:Place ;
+          rdfs:range rdfs:Literal ;
+          rdfs:comment "The name of a place or a user mention." .
+
+
+###  http://schema.org/addressCountry
+schema:addressCountry rdf:type owl:DatatypeProperty ;
+                      rdfs:domain schema:Place ,
+                                  mgkb:TotalUnemploymentRate ,
+                                  mgkb:YouthUnemploymentRate ,
+                                  fibo-ind-ei-ei:GrossDomesticProduct ;
+                      rdfs:range rdfs:Literal ;
+                      rdfs:comment "The country. For example, USA. You can also provide the two-letter ISO 3166-1 alpha-2 country code." .
+
+
+###  http://schema.org/description
+schema:description rdf:type owl:DatatypeProperty ;
+                   rdfs:domain rdfs:Resource ;
+                   rdfs:range rdfs:Literal ;
+                   rdfs:comment "The description of an entity in wikipedia." .
+
+
+###  http://schema.org/latitude
+schema:latitude rdf:type owl:DatatypeProperty ;
+                rdfs:domain schema:Place ;
+                rdfs:range rdfs:Literal ;
+                rdfs:comment "The latitude of coordinates of a Tweet." .
+
+
+###  http://schema.org/longitude
+schema:longitude rdf:type owl:DatatypeProperty ;
+                 rdfs:domain schema:Place ;
+                 rdfs:range rdfs:Literal ;
+                 rdfs:comment "The longitude of the coordinate of a Tweet." .
+
+
+###  http://schema.org/userInteractionCount
+schema:userInteractionCount rdf:type owl:DatatypeProperty ;
+                            rdfs:domain schema:InteractionCounter ;
+                            rdfs:range rdfs:Literal ;
+                            rdfs:comment "The user interaction count of an interaction action such as Like, Reply and Share." .
+
+
+###  http://www.ics.forth.gr/isl/oae/core#confidence
+nee:confidence rdf:type owl:DatatypeProperty ;
+               rdfs:domain nee:Entity ;
+               rdfs:range rdfs:Literal ;
+               rdfs:comment "Relates an entity to a literal representing the confidence of an ambiguous entity." .
+
+
+###  http://www.ics.forth.gr/isl/oae/core#detectedAs
+nee:detectedAs rdf:type owl:DatatypeProperty ;
+               rdfs:domain nee:Entity ;
+               rdfs:range rdfs:Literal ;
+               rdfs:comment "The detected entity mention using entity linking." .
+
+
+###  http://www.w3.org/2000/01/rdf-schema#label
+rdfs:label rdf:type owl:DatatypeProperty ;
+           rdfs:domain sioc_t:Tag ,
+                       rdfs:Resource ;
+           rdfs:range rdfs:Literal ;
+           rdfs:comment "represents a label of either Resource or a hashtag." .
+
+
+###  https://spec.edmcouncil.org/fibo/ontology/FND/DatesAndTimes/FinancialDates/hasDateValue
+fibo-fnd-dt-fd:hasDateValue rdf:type owl:DatatypeProperty ;
+                            rdfs:domain fibo-fnd-dt-fd:ExplicitDate ;
+                            rdfs:range xsd:dateTime ;
+                            rdfs:comment "specifies an actual literal (explicit) date." .
+
+
+###  https://spec.edmcouncil.org/fibo/ontology/IND/EconomicIndicators/EconomicIndicators/hasIndicatorValue
+fibo-ind-ei-ei:hasIndicatorValue rdf:type owl:DatatypeProperty ;
+                                 rdfs:domain mgkb:TotalUnemploymentRate ,
+                                             mgkb:YouthUnemploymentRate ,
+                                             fibo-ind-ei-ei:GrossDomesticProduct ;
+                                 rdfs:range rdfs:Literal ;
+                                 rdfs:comment "has an indicator value of the economic indicators." .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://rdfs.org/sioc/ns#Post
+sioc:Post rdf:type owl:Class ;
+          rdfs:comment "A post represents a Tweet." .
+
+
+###  http://rdfs.org/sioc/ns#UserAccount
+sioc:UserAccount rdf:type owl:Class ;
+                 rdfs:comment "A user account contains an encrypted id." .
+
+
+###  http://rdfs.org/sioc/types#Tag
+sioc_t:Tag rdf:type owl:Class ;
+           rdfs:comment "A tag represents a hashtag." .
+
+
+###  http://schema.org/Action
+schema:Action rdf:type owl:Class ;
+              rdfs:comment """[An action performed by a direct agent and indirect participants upon a direct object. Optionally happens at a location with the help of an inanimate instrument. The execution of the action may produce a result. Specific action sub-type documentation specifies the exact expectation of each argument/role.]
+
+Action that includes LikeAction, ShareAction and ReplyAction.""" .
+
+
+###  http://schema.org/InteractionCounter
+schema:InteractionCounter rdf:type owl:Class ;
+                          rdfs:comment """[A summary of how users have interacted with this CreativeWork. In most cases, authors will use a subtype to specify the specific type of interaction.]
+
+A class that represents the public metrics of a tweet, includes LikeAction (like_count), ShareAction (retweet_count), ReplyAction (reply_count).""" .
+
+
+###  http://schema.org/Place
+schema:Place rdf:type owl:Class ;
+             rdfs:comment "Place represents the geo information of a Tweet, which contains a country code, a place name, the latitude and the longitude." .
+
+
+###  http://www.gsi.dit.upm.es/ontologies/onyx/ns#Emotion
+onyx:Emotion rdf:type owl:Class ;
+             rdfs:comment "Class that represents emotions in a generic way" .
+
+
+###  http://www.gsi.dit.upm.es/ontologies/onyx/ns#EmotionCategory
+onyx:EmotionCategory rdf:type owl:Class ;
+                     rdfs:comment """Value that represents the type of emotion. 
+It has three individuals:
+negative emotion, neutral emotion and positive emotion""" .
+
+
+###  http://www.gsi.dit.upm.es/ontologies/onyx/ns#EmotionSet
+onyx:EmotionSet rdf:type owl:Class ;
+                rdfs:comment "Describes the concept of emotion expressed in a certain text" .
+
+
+###  http://www.ics.forth.gr/isl/oae/core#Entity
+nee:Entity rdf:type owl:Class ;
+           rdfs:comment "Represents an identified entity from wikipedia." .
+
+
+###  http://www.w3.org/2000/01/rdf-schema#Resource
+rdfs:Resource rdf:type owl:Class .
+
+
+###  http://www.w3.org/ns/prov#Activity
+<http://www.w3.org/ns/prov#Activity> rdf:type owl:Class ;
+                                     rdfs:comment "An activity is something that occurs over a period of time and acts upon or with entities; it may include consuming, processing, transforming, modifying, relocating, using, or generating entities." .
+
+
+###  http://www.w3.org/ns/prov#Agent
+<http://www.w3.org/ns/prov#Agent> rdf:type owl:Class ;
+                                  rdfs:comment "An agent is something that bears some form of responsibility for an activity taking place, for the existence of an entity, or for another agent's activity." .
+
+
+###  http://www.w3.org/ns/prov#Entity
+<http://www.w3.org/ns/prov#Entity> rdf:type owl:Class ;
+                                   rdfs:comment "An entity is a physical, digital, conceptual, or other kind of thing with some fixed aspects; entities may be real or imaginary." .
+
+
+###  http://www.w3.org/ns/prov#Organization
+<http://www.w3.org/ns/prov#Organization> rdf:type owl:Class ;
+                                         rdfs:subClassOf <http://www.w3.org/ns/prov#Agent> ;
+                                         rdfs:comment "An organization is a goverment entity or a company collecting the statistics in a specific region and in a specific time period." .
+
+
+###  https://migrationsKB.github.io/MGKB#EconomicIndicators
+mgkb:EconomicIndicators rdf:type owl:Class ;
+                        rdfs:comment "The Economic indicators which contain unemployment rate and gross domestic product growth rate." .
+
+
+###  https://migrationsKB.github.io/MGKB#TotalUnemploymentRate
+mgkb:TotalUnemploymentRate rdf:type owl:Class ;
+                           rdfs:subClassOf fibo-ind-ei-ei:UnemploymentRate ;
+                           rdfs:comment "The unemployment rate which of the active population aged from 24 to 74 years old." .
+
+
+###  https://migrationsKB.github.io/MGKB#YouthUnemploymentRate
+mgkb:YouthUnemploymentRate rdf:type owl:Class ;
+                           rdfs:subClassOf fibo-ind-ei-ei:UnemploymentRate ;
+                           rdfs:comment "The unemployment rate which of the active population aged from 15 to 24 years old." .
+
+
+###  https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Assessments/AssessmentActivity
+fibo-fnd-arr-asmt:AssessmentActivity rdf:type owl:Class ;
+                                     rdfs:subClassOf <http://www.w3.org/ns/prov#Activity> ;
+                                     rdfs:comment "activity involving the evaluation or estimation of the economic indicators, such as GDPR and unemployment rate in a specific region for a specific period of time." .
+
+
+###  https://spec.edmcouncil.org/fibo/ontology/FND/DatesAndTimes/FinancialDates/ExplicitDate
+fibo-fnd-dt-fd:ExplicitDate rdf:type owl:Class ;
+                            rdfs:comment "An explicit date for the reporting the economic indicators." .
+
+
+###  https://spec.edmcouncil.org/fibo/ontology/IND/EconomicIndicators/EconomicIndicators/GrossDomesticProduct
+fibo-ind-ei-ei:GrossDomesticProduct rdf:type owl:Class ;
+                                    rdfs:subClassOf mgkb:EconomicIndicators ;
+                                    rdfs:comment """an economic indicator representing the broadest measure of aggregate economic activity, measuring the total unduplicated market value of all final goods and services produced within a statistical area in a period
+
+
+ data source: real GDP growth rate from EUROSTAT""" .
+
+
+###  https://spec.edmcouncil.org/fibo/ontology/IND/EconomicIndicators/EconomicIndicators/UnemployedPopulation
+fibo-ind-ei-ei:UnemployedPopulation rdf:type owl:Class ;
+                                    rdfs:comment "subset of the civilian labor force that is considered to have had no employment but was available for work, except for temporary illness, and had made specific efforts to find employment sometime during a specified period, during the reporting period" .
+
+
+###  https://spec.edmcouncil.org/fibo/ontology/IND/EconomicIndicators/EconomicIndicators/UnemploymentRate
+fibo-ind-ei-ei:UnemploymentRate rdf:type owl:Class ;
+                                rdfs:subClassOf mgkb:EconomicIndicators ;
+                                rdfs:comment "an economic indicator representing the ratio of the unemployed population with respect to the civilian labor force of a given economy for some specified period" .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://schema.org/LikeAction
+schema:LikeAction rdf:type owl:NamedIndividual ,
+                           schema:Action ;
+                  rdfs:comment "Like action of tweets" .
+
+
+###  http://schema.org/ReplyAction
+schema:ReplyAction rdf:type owl:NamedIndividual ,
+                            schema:Action ;
+                   rdfs:comment "Reply action of tweets" .
+
+
+###  http://schema.org/ShareAction
+schema:ShareAction rdf:type owl:NamedIndividual ,
+                            schema:Action ;
+                   rdfs:comment "Share action of tweets" .
+
+
+###  http://www.gsi.dit.upm.es/ontologies/wnaffect/ns#hate
+wna:hate rdf:type owl:NamedIndividual ,
+                  onyx:EmotionCategory ;
+         rdfs:comment "hate represents hate speeches resulted from hate speech detection." .
+
+
+###  http://www.gsi.dit.upm.es/ontologies/wnaffect/ns#negative-emotion
+wna:negative-emotion rdf:type owl:NamedIndividual ,
+                              onyx:EmotionCategory ;
+                     rdfs:comment "negative-emotion represents negative sentiment" .
+
+
+###  http://www.gsi.dit.upm.es/ontologies/wnaffect/ns#neutral-emotion
+wna:neutral-emotion rdf:type owl:NamedIndividual ,
+                             onyx:EmotionCategory ;
+                    rdfs:comment "neutral-emotion represents neutral sentiment" .
+
+
+###  http://www.gsi.dit.upm.es/ontologies/wnaffect/ns#positive-emotion
+wna:positive-emotion rdf:type owl:NamedIndividual ,
+                              onyx:EmotionCategory ;
+                     rdfs:comment "positive sentiment resulted from sentiment analysis" .
+
+
+###  https://migrationsKB.github.io/MGKB#ONS
+mgkb:ONS rdf:type owl:NamedIndividual ,
+                  <http://www.w3.org/ns/prov#Organization> ;
+         rdfs:comment "Office for National Statistics in UK." .
+
+
+###  https://migrationsKB.github.io/MGKB#UKParliament
+mgkb:UKParliament rdf:type owl:NamedIndividual ,
+                           <http://www.w3.org/ns/prov#Organization> ;
+                  rdfs:comment """UK Parliament, House of Commons Library
+https://commonslibrary.parliament.uk/""" .
+
+
+###  https://migrationsKB.github.io/MGKB#assessment-activity-eurostat
+mgkb:assessment-activity-eurostat rdf:type owl:NamedIndividual ,
+                                           fibo-fnd-arr-asmt:AssessmentActivity ;
+                                  rdfs:comment "Assessment Activity of eurostat" .
+
+
+###  https://migrationsKB.github.io/MGKB#assessment-activity-ons
+mgkb:assessment-activity-ons rdf:type owl:NamedIndividual ,
+                                      fibo-fnd-arr-asmt:AssessmentActivity ;
+                             rdfs:comment "Assessment Activity of Office for National Statistics" .
+
+
+###  https://migrationsKB.github.io/MGKB#assessment-activity-statista
+mgkb:assessment-activity-statista rdf:type owl:NamedIndividual ,
+                                           fibo-fnd-arr-asmt:AssessmentActivity ;
+                                  rdfs:comment "Assessment activity of statista.com" .
+
+
+###  https://migrationsKB.github.io/MGKB#assessment-activity-uk-parliament
+mgkb:assessment-activity-uk-parliament rdf:type owl:NamedIndividual ,
+                                                fibo-fnd-arr-asmt:AssessmentActivity ;
+                                       rdfs:comment "Assessment activity of UK Parliament" .
+
+
+###  https://migrationsKB.github.io/MGKB#eurostat
+mgkb:eurostat rdf:type owl:NamedIndividual ,
+                       <http://www.w3.org/ns/prov#Organization> ;
+              rdfs:comment """Eurostat is the statistical office of the European Union.
+
+https://ec.europa.eu/eurostat/about/who-we-are""" .
+
+
+###  https://migrationsKB.github.io/MGKB#normal
+mgkb:normal rdf:type owl:NamedIndividual ,
+                     onyx:EmotionCategory ;
+            rdfs:comment "normal represents normal speeches resulted from hate speech detection." .
+
+
+###  https://migrationsKB.github.io/MGKB#offensive
+mgkb:offensive rdf:type owl:NamedIndividual ,
+                        onyx:EmotionCategory ;
+               rdfs:comment "offensive represents offensive speeches resulted from hate speech detection." .
+
+
+###  https://migrationsKB.github.io/MGKB#statista
+mgkb:statista rdf:type owl:NamedIndividual ,
+                       <http://www.w3.org/ns/prov#Organization> ;
+              rdfs:comment """Statista Company 
+https://www.statista.com/""" .
+
+
+###  https://migrationsKB.github.io/MGKB#total-unemployed-population
+mgkb:total-unemployed-population rdf:type owl:NamedIndividual ,
+                                          fibo-ind-ei-ei:UnemployedPopulation ;
+                                 rdfs:comment "Unemployed persons aged 15 to 74 by the total active population of the same age group" .
+
+
+###  https://migrationsKB.github.io/MGKB#youth-unemployed-population
+mgkb:youth-unemployed-population rdf:type owl:NamedIndividual ,
+                                          fibo-ind-ei-ei:UnemployedPopulation ;
+                                 rdfs:comment "Unemployed persons aged 15 to 24 by the total active population of the same age group" .
+
+
+#################################################################
+#    Annotations
+#################################################################
+
+rdfs:Resource rdfs:comment "Identify the resource of an entity, which is a URI of wikipedia." .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi
