@@ -11,56 +11,7 @@ import numpy as np
 import pandas as pd
 
 from utils.api_authen import load_academic_research_brearer
-
-
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
-
-
-def get_params(cwd):
-    """
-    Loading the parameters for quering the tweets using API.
-    :param cwd: current working directory
-    :return:
-    """
-    config_dir = os.path.join(cwd, 'src', 'config')
-
-    with open(os.path.join(config_dir, 'tweets_fields.json')) as file:
-        tweets_fields = json.load(file)
-
-    with open(os.path.join(config_dir, 'poll_fields.json')) as file:
-        poll_fields = json.load(file)
-
-    with open(os.path.join(config_dir, 'media_fields.json')) as file:
-        media_fields = json.load(file)
-
-    with open(os.path.join(config_dir, 'user_fields.json')) as file:
-        user_fields = json.load(file)
-
-    with open(os.path.join(config_dir, 'place_fields.json')) as file:
-        place_fields = json.load(file)
-
-    with open(os.path.join(config_dir, 'expansions.json')) as file:
-        expansions = json.load(file)
-
-    tweets_fields = ','.join(tweets_fields)
-
-    poll_fields = ','.join(poll_fields)
-
-    media_fields = ','.join(media_fields)
-
-    user_fields = ','.join(user_fields)
-    # print(user_fields)
-
-    place_fields = ','.join(place_fields)
-    # print(place_fields)
-
-    tweets_expansions = ','.join(expansions)
-    # print(tweets_expansions)
-
-    return tweets_fields, poll_fields, media_fields, user_fields, place_fields, tweets_expansions
+from utils.utils import get_params, load_keywords_for_lang
 
 
 def get_last_start_time(dir):
@@ -72,6 +23,7 @@ def get_last_start_time(dir):
     files = glob(dir + '/**.gz')
     print('nr of existing files:', len(files))
     if files is not None and files != []:
+        print(files)
         dir_dict = {int(filepath.split('_')[1]): filepath for filepath in files}
         od = OrderedDict(sorted(dir_dict.items(), reverse=True))
         first_key = list(od)[0]
@@ -80,22 +32,6 @@ def get_last_start_time(dir):
         return start_time
     else:
         return None
-
-
-def get_keywords_by_category(category_dir='data/1st_round/hashtags_categories'):
-    """
-    Get the keywords by category
-    :param category:
-    :return:
-    """
-    keywords = []
-    for file in glob(category_dir + '/**.txt'):
-        # print(file)
-        with open(file) as reader:
-            for line in reader.readlines():
-                line = '#' + line.replace('\n', '')
-                keywords.append(line)
-    return list(set(keywords))
 
 
 def query_main(api_name, country_iso2, keywords, idx, lang, start_year, end_year):
@@ -122,14 +58,14 @@ def query_main(api_name, country_iso2, keywords, idx, lang, start_year, end_year
 
     startdate = start_year + '-01-01T00:00:00.00Z'
     # change end time accordingly.
-    enddate = end_year + '-01-01T00:00:00.00Z'
+    enddate = end_year + '-08-02T00:00:00.00Z'
     # set up start_time and end_time parameters in API call
     # max_results, to maximum 500
 
     # check if the data dir for a country exists.
     # idx batch of keywords
     keywords_ = keywords[idx]
-    output_dir_root = os.path.join(cwd, 'data', '2nd-round-data', country_iso2)
+    output_dir_root = os.path.join(cwd, 'data', '3rd-round-data', country_iso2)
     if not os.path.exists(output_dir_root):
         os.mkdir(output_dir_root)
 
@@ -140,6 +76,7 @@ def query_main(api_name, country_iso2, keywords, idx, lang, start_year, end_year
     output_dir = os.path.join(output_dir_, lang)
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
+
 
     query = "({}) has:geo place_country:{} -is:retweet -is:nullcast".format(
         ' OR '.join(keywords_), country_iso2)
@@ -160,7 +97,7 @@ def query_main(api_name, country_iso2, keywords, idx, lang, start_year, end_year
                         'poll.fields': poll_fields,
                         'place.fields': place_fields,
                         'expansions': tweets_expansions,
-                        'start_time': startdate, 'end_time': start_time, 'max_results': 500}
+                        'start_time': startdate, 'end_time': start_time, 'max_results': 100}
     else:
         query_params = {'query': query,
                         'tweet.fields': tweets_fields,
@@ -169,9 +106,11 @@ def query_main(api_name, country_iso2, keywords, idx, lang, start_year, end_year
                         'poll.fields': poll_fields,
                         'place.fields': place_fields,
                         'expansions': tweets_expansions,
-                        'start_time': startdate, 'end_time': enddate, 'max_results': 500}
+                        'start_time': startdate, 'end_time': enddate, 'max_results': 100}
 
-    headers = {"Authorization": "Bearer {}".format(brear_token)}
+    # https://github.com/twitterdev/Twitter-API-v2-sample-code/blob/main/Full-Archive-Search/full-archive-search.py
+    headers = {"Authorization": "Bearer {}".format(brear_token),
+               "User-Agent": "v2FullArchiveSearchPython" }
 
     ###################query################################
     # connect to end point.
@@ -211,13 +150,16 @@ def main(api_name, country_iso2, keywords, idx, lang, start_year, end_year, flag
                     main(api_name, country_iso2, keywords, idx, lang, start_year, end_year, flag=True)
                 print('*' * 100)
             except Exception:
-                if idx < 42:
+                if idx < 58:
                     idx += 1
                     print('idx:', idx)
                     main(api_name, country_iso2, keywords, idx, lang, start_year, end_year, flag=True)
                 else:
                     break
+
         else:
+            # response code ==429, rate limit exceeded. 100 api calls finished, wait another hour.
+
             flag = False
             raise Exception(response.status_code, response.text)
 
@@ -225,15 +167,14 @@ def main(api_name, country_iso2, keywords, idx, lang, start_year, end_year, flag
 if __name__ == '__main__':
     # import plac
     # plac.call(call_main)
-    destination_countries = ['HU', 'IT', 'SE']
-    # finished :PL, GB, NL, DE, CH, AT, ES, FR, HU
+    destination_countries = ['GB']
+    # finished :PL, GB, NL, DE, CH, AT, ES, FR, HU,IT, SE
     # for country in destination_countries:
     # keywords_list = get_keywords_by_category()
     # keywords_chunks = list(chunks(keywords_list, 40))
-    with open('data/1st_round/chunked_hashtags.json') as file:
+    with open('data/extracted/keywords_chunked_all.json') as file:
         keywords_chunks = json.load(file)
-    idx = 40
-    main('itflowsapi', 'SE', keywords_chunks, idx, 'en', '2013', '2021')
-
-    # for x in range(15, 42):
-    #     call_main('itflowsapi', 'AT', x, 'en', '2013', '2021')
+    # idx =
+    # main('itflowsapi', 'GB', keywords_chunks, idx, 'en', '2021', '2022')
+    for x in range(42, 58):
+        main('itflowsapi', 'GB', keywords_chunks, x, 'en', '2021', '2021')

@@ -7,7 +7,7 @@ from tweepy import OAuthHandler
 
 def load_tweepy_api(input_dir, api_name):
     # loading credentials
-    credentials = yaml.load(open(os.path.join(input_dir, 'src', 'config', 'credentials.yaml')), yaml.FullLoader)
+    credentials = yaml.load(open(os.path.join(input_dir, 'crawler', 'config', 'credentials.yaml')), yaml.FullLoader)
     consumer_key = credentials[api_name]['key']
     consumer_secret = credentials[api_name]['secret']
     access_token = credentials[api_name]['oauth_token']
@@ -22,6 +22,6 @@ def load_tweepy_api(input_dir, api_name):
 
 
 def load_academic_research_brearer(input_dir, api_name):
-    credentials = yaml.load(open(os.path.join(input_dir, 'src', 'config', 'credentials.yaml')), yaml.FullLoader)
+    credentials = yaml.load(open(os.path.join(input_dir,'crawler', 'config', 'credentials.yaml')), yaml.FullLoader)
     brearer = credentials[api_name]['bearer_token']
     return brearer

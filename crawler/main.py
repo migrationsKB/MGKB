@@ -12,7 +12,7 @@ import pandas as pd
 
 from utils.api_authen import load_academic_research_brearer
 from utils.country_info import CountryInfo
-from utils.load_keywords import load_keywords_for_lang
+from utils.utils import load_keywords_for_lang
 
 
 def get_params(cwd):
