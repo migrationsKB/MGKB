@@ -3,6 +3,8 @@
   "type",
   "duration_ms",
   "height",
+  "non_public_metrics",
+  "organic_metrics",
   "width",
   "preview_image_url",
   "public_metrics"

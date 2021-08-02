@@ -10,6 +10,8 @@
   "geo",
   "in_reply_to_user_id",
   "lang",
+  "non_public_metrics",
+  "organic_metrics",
   "possibly_sensitive",
   "public_metrics",
   "referenced_tweets",
