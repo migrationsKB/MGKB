@@ -96,12 +96,12 @@ def define_entity_resources(entities_dict):
 
 
 def define_economic_indicators():
-    real_gdp_r = pd.read_csv('../eurostat_stats/csv/real_gdp_growth_rate.csv',
+    real_gdp_r = pd.read_csv('../data/eurostat_stats/csv/real_gdp_growth_rate.csv',
                              index_col=0)
-    total_unemployment_rate = pd.read_csv('../eurostat_stats/csv/unemployment_rate.csv',
+    total_unemployment_rate = pd.read_csv('../data/eurostat_stats/csv/unemployment_rate.csv',
                                           index_col=0)
     youth_unemployment_rate = pd.read_csv(
-        '../eurostat_stats/csv/youth_unemployment_rate.csv', index_col=0)
+        '../data/eurostat_stats/csv/youth_unemployment_rate.csv', index_col=0)
 
     rgdpr_dict = real_gdp_r.to_dict()
     total_ur = total_unemployment_rate.to_dict()
@@ -208,14 +208,14 @@ def add_triples_for_one_tweet(g, row, entities_dict):
 
     # place schema.
     p_id = 'p' + idx
-    place_name = row['place_fullname']
+    place_name = row['full_name']
     # print('place name:', place_name)
     country_code = row['country_code']
-    twi_lat = row['twi_lat']
-    twi_lon = row['twi_long']
-    pred_lat = row['pred_lat']
-    pred_lon = row['pred_lon']
-    consistent = row['consistent']
+    twi_lat = row['lat']
+    twi_lon = row['long']
+    # pred_lat = row['pred_lat']
+    # pred_lon = row['pred_lon']
+    # consistent = row['consistent']
     place_instance = URIRef(MGKB + p_id)
     g.add((place_instance, RDF.type, schema.Place))  # place individual of schema:Place
     g.add((place_instance, schema.addressCountry, Literal(country_code)))  # place individual has country code
@@ -227,10 +227,10 @@ def add_triples_for_one_tweet(g, row, entities_dict):
     if str(twi_lon) != 'nan' and str(twi_lat) != 'nan':
         g.add((place_instance, schema.latitude, Literal(twi_lat)))
         g.add((place_instance, schema.longitude, Literal(twi_lon)))
-    elif consistent:
-        if str(pred_lat) != 'nan' and str(pred_lon) != 'nan':
-            g.add((place_instance, schema.latitude, Literal(pred_lat)))
-            g.add((place_instance, schema.longitude, Literal(pred_lon)))
+    # elif consistent:
+    #     if str(pred_lat) != 'nan' and str(pred_lon) != 'nan':
+    #         g.add((place_instance, schema.latitude, Literal(pred_lat)))
+    #         g.add((place_instance, schema.longitude, Literal(pred_lon)))
 
     g.add((instance, schema.location, place_instance))  # has location
 
@@ -285,7 +285,8 @@ def add_triples_for_one_tweet(g, row, entities_dict):
             g.add((instance, schema.mentions, mention_instance))
 
     # schema: interactionStatistics
-    if not np.isnan(row['like_count']):
+    # if not np.isnan(row['like_count']):
+    if row['like_count'] is not None:
         like_count = int(row['like_count'])
         like_instance = URIRef(MGKB + 'like' + idx)
         g.add((like_instance, RDF.type, schema.IneractionCounter))
@@ -293,7 +294,8 @@ def add_triples_for_one_tweet(g, row, entities_dict):
         g.add((like_instance, schema.userInteractionCount, Literal(like_count)))
         g.add((instance, schema.interactionStatistics, like_instance))
 
-    if not np.isnan(row['retweet_count']):
+    # if not np.isnan(row['retweet_count']):
+    if row['retweet_count'] is not None:
         share_count = int(row['retweet_count'])
         share_instance = URIRef(MGKB + 'share' + idx)
         g.add((share_instance, RDF.type, schema.IneractionCounter))
@@ -301,8 +303,9 @@ def add_triples_for_one_tweet(g, row, entities_dict):
         g.add((share_instance, schema.userInteractionCount, Literal(share_count)))
         g.add((instance, schema.interactionStatistics, share_instance))
 
-    if not np.isnan(row['reply_count']):
-        reply_count = int(row['reply_count'])
+    # if not np.isnan(row['reply_count']):
+    if row['reply_count'] is not None:
+        reply_count = int(literal_eval(row['reply_count']))
         # quote_count = int(row['quote_count'])
         reply_instance = URIRef(MGKB + 'reply' + idx)
         # quote_instance = URIRef(MGKB +'quote'+idx)
@@ -314,7 +317,8 @@ def add_triples_for_one_tweet(g, row, entities_dict):
     ### sentiment
     senti_instance = URIRef(MGKB + 'senti' + idx)
     pred_sentiment = row['pred_sentiment']
-    pred_hatespeech = row['hatespeech_label']
+    # pred_hatespeech = row['hatespeech_label']
+    pred_hatespeech = row['hatespeech_pred']
     g.add((senti_instance, RDF.type, onyx.Emotion))
 
     if pred_sentiment == 0:
@@ -324,11 +328,11 @@ def add_triples_for_one_tweet(g, row, entities_dict):
     if pred_sentiment == 2:
         g.add((senti_instance, onyx.hasEmotionCategory, positive_emotion))
 
-    if pred_hatespeech == 'normal':
+    if pred_hatespeech == 0:  # 'normal':
         g.add((senti_instance, onyx.hasEmotionCategory, normal_speech))
-    if pred_hatespeech == 'hatespeech':
+    if pred_hatespeech == 2:  # 'hatespeech':
         g.add((senti_instance, onyx.hasEmotionCategory, hate_speech))
-    if pred_hatespeech == 'offensive':
+    if pred_hatespeech == 1:  # 'offensive':
         g.add((senti_instance, onyx.hasEmotionCategory, offensive_speech))
 
     es_instance = URIRef(MGKB + 'es' + idx)
@@ -352,11 +356,18 @@ def add_triples_for_one_tweet(g, row, entities_dict):
 
 
 if __name__ == '__main__':
-    df = pd.read_csv('input/migrationsKB_uuid_20210520.csv', low_memory=False)
-    row_one = df.loc[25695]
+    df = pd.read_csv('../data/kb/input/df_50_tm_sentiment_hsd_entities.csv', low_memory=False)
+    df.dropna(subset=['created_at'], inplace=True)
+    df.dropna(subset=['country_code'], inplace=True)
+    df = df[df['topic_immig_max_score'] > 0.45]
+    df['Year'] = [int(x) for x in df['created_at'].str.slice(stop=4)] #200k
+    print(f'len of df: {len(df)}')  # 307339
+
+    # df = df.sample(10)
+
     now = datetime.now()
     date_time = now.strftime("%m%d%Y_%H%M%S")
-    with open('../data/entities_extracted.json') as file:
+    with open('../data/extracted/entities_dict_extracted_20210810.json') as file:
         entities_dict = json.load(file)
 
     ## entity resources
@@ -368,4 +379,4 @@ if __name__ == '__main__':
         add_triples_for_one_tweet(g, row, entities_dict)
         count += 1
 
-    g.serialize(f"output/migrationsKB_{date_time}.ttl", format="turtle")
+    g.serialize(destination=f"output/migrationsKB_{date_time}.nt", format="nt")
