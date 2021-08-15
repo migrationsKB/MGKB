@@ -37,7 +37,7 @@ def preprocess_one_tweet(text):
     doc = nlp(text)
     doc = [token.lemma_ for token in doc if not token.is_stop and not token.is_punct]
     doc = [word.lower().translate(str.maketrans('', '', string.punctuation + "0123456789")) for word in doc]
-    doc = [w for w in doc if len(w) > 1]
+    doc = [w for w in doc if len(w) >= 2]
     doc = " ".join(doc)
     doc = " ".join(doc.split())
     return doc
@@ -59,11 +59,11 @@ def text_processing(docs: List, output_dir: str = os.path.join(rootdir, 'preproc
 
 
 if __name__ == '__main__':
-    df = pd.read_csv('datasets/tweets_df_tm.csv')
+    df = pd.read_csv('data/preprocessed/df_geo.csv', index_col=0)
     df['preprocessed_text'] = df['text'].parallel_apply(preprocess_one_tweet)  # 384891
 
     df_dropna = df.dropna(subset=['preprocessed_text'])  # 384752
 
     df_dedup = df_dropna.drop_duplicates(subset=['preprocessed_text'])  # 360377
     df_sorted = df_dedup.sort_values(by='created_at')
-    df_sorted.to_csv('datasets/tweets_df_tm_processed.csv')
+    df_sorted.to_csv('data/preprocessed/df_geo_text_preprocessed.csv')
