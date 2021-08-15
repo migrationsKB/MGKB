@@ -3,6 +3,7 @@ import json
 import re
 import sys
 import os
+import argparse
 from glob import glob
 from collections import OrderedDict, defaultdict
 
@@ -10,19 +11,26 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
-sys.path.insert(0, 'MGKB/')
+sys.path.insert(0, '/home/yiyi/MigrTwi')
 
-from src.utils.reader import read_gz_file
-from src.entity_linking import main_linking
-from src.entity_linking.main_linking import load_prerequisites, config, get_entities_from_sentences
+from utils.reader import read_gz_file
+from entity_linking import main_linking
+from entity_linking.main_linking import load_prerequisites, config, get_entities_from_sentences
+
+
+parser = argparse.ArgumentParser(description='Entity Linking for Tweets...')
+parser.add_argument('--input_file', type=str, default='data/preprocessed/df_text_preprocessed_tm.csv', help='Input file for Entity Linking of Tweets...')
+parser.add_argument('--output_dir', type=str, default='data/entities', help='Ouput directory of Entity Linking...')
+
+argss=parser.parse_args()
+
 
 print('load prerequisites for blink entity ....')
 ner_model, models, args = load_prerequisites(config)
 
-tweets_dict_file = 'entity_linking/relevant_tweets_el_prep.csv'
 
-with open(tweets_dict_file) as file:
-    df= pd.read_csv(file)
+print(f'Reading input file {argss.input_file} ...')
+df = pd.read_csv(argss.input_file, index_col=0)
     
 
 class NpEncoder(json.JSONEncoder):
@@ -36,15 +44,13 @@ class NpEncoder(json.JSONEncoder):
         else:
             return super(NpEncoder, self).default(obj)
 
-sentences= df['prep_el'].tolist()
+sentences= df['text'].tolist()
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
         
-
-output_dir = 'entity_linking/entities_relevant_score/'
 
 def get_latest_nr(output_dir):
     nrs = [int(re.sub("\D", "", x)) for x in glob(output_dir+'**.json')]
@@ -66,7 +72,7 @@ for chunk in tqdm(chunks_):
         
         print('write the entities dict to ...','entities_dict{}.json'.format(chunk_idx) )
         
-        with open(output_dir+'entities_dict_{}.json'.format(chunk_idx), 'w') as writer:
+        with open(argss.output_dir+'entities_dict_{}.json'.format(chunk_idx), 'w') as writer:
             json.dump(entities_dict_, writer)
 
     except Exception:

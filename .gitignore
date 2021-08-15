@@ -4,3 +4,4 @@ data/preprocessed
 crawler/config/credentials.yaml
 populate_ontology/input
 populate_ontology/output
+models
