@@ -361,22 +361,24 @@ if __name__ == '__main__':
     df.dropna(subset=['country_code'], inplace=True)
     df = df[df['topic_immig_max_score'] > 0.45]
     df['Year'] = [int(x) for x in df['created_at'].str.slice(stop=4)] #200k
-    print(f'len of df: {len(df)}')  # 307339
+    for year in [2021]:
+        df_year = df[df['Year']==year]
 
-    # df = df.sample(10)
+        print(f'len of df: {len(df_year)}')  # 307339
 
-    now = datetime.now()
-    date_time = now.strftime("%m%d%Y_%H%M%S")
-    with open('../data/extracted/entities_dict_extracted_20210810.json') as file:
-        entities_dict = json.load(file)
+        # df = df.sample(10)
 
-    ## entity resources
-    define_entity_resources(entities_dict)
-    rgdpr_dict, total_ur, youth_ur = define_economic_indicators()
-    count = 0
-    for idx, row in df.iterrows():
-        print('processing ...', count, '\r')
-        add_triples_for_one_tweet(g, row, entities_dict)
-        count += 1
+        now = datetime.now()
+        date_time = now.strftime("%m%d%Y_%H%M%S")
+        with open('../data/extracted/entities_dict_extracted_20210810.json') as file:
+            entities_dict = json.load(file)
 
-    g.serialize(destination=f"output/migrationsKB_{date_time}.nt", format="nt")
+        ## entity resources
+        define_entity_resources(entities_dict)
+        rgdpr_dict, total_ur, youth_ur = define_economic_indicators()
+        count = 0
+        for idx, row in df_year.iterrows():
+            add_triples_for_one_tweet(g, row, entities_dict)
+            count += 1
+
+        g.serialize(destination=f"output/yearly/migrationsKB_{year}.nt", format="nt")

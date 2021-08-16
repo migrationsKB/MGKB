@@ -76,7 +76,11 @@
   * relevant topics: 
     * [ 0,1,2,3,5,8,12,13,15,16,18,22,24,25, 29,32,34,36,41,42,45,47,48]
   * show the topics and topic words
+    * ![](topic_modeling/topic_words/topicwords_50.json)
   
 
 ### 8. KB population
-
+* Populate Knowledge Base
+  * `python 01_populate_kb.py`
+* Generate Documentation for RDF schema
+  * `python 02_document_schema.py`

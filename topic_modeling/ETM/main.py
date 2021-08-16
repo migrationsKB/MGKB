@@ -1,14 +1,13 @@
-#/usr/bin/python
+# /usr/bin/python
 
 from __future__ import print_function
 
 import argparse
 import torch
-import pickle 
-import numpy as np 
-import os 
+import pickle
+import numpy as np
+import os
 import math
-
 
 import data
 import scipy.io
@@ -21,9 +20,10 @@ from topic_modeling.ETM.utils import nearest_neighbors, get_topic_coherence, get
 parser = argparse.ArgumentParser(description='The Embedded Topic Model')
 
 ### data and file related arguments
-parser.add_argument('--dataset', type=str, default='hateXplain', help='name of corpus')
+parser.add_argument('--dataset', type=str, default='tweets', help='name of corpus')
 parser.add_argument('--data_path', type=str, default='data/etm_data', help='directory containing data')
-parser.add_argument('--emb_path', type=str, default='data/etm_data/embeddings.txt', help='directory containing word embeddings')
+parser.add_argument('--emb_path', type=str, default='data/etm_data/embeddings.txt',
+                    help='directory containing word embeddings')
 parser.add_argument('--save_path', type=str, default='topic_modeling/results/', help='path to save results')
 parser.add_argument('--batch_size', type=int, default=1000, help='input batch size for training')
 
@@ -32,7 +32,8 @@ parser.add_argument('--num_topics', type=int, default=50, help='number of topics
 parser.add_argument('--rho_size', type=int, default=300, help='dimension of rho')
 parser.add_argument('--emb_size', type=int, default=300, help='dimension of embeddings')
 parser.add_argument('--t_hidden_size', type=int, default=800, help='dimension of hidden space of q(theta)')
-parser.add_argument('--theta_act', type=str, default='relu', help='tanh, softplus, relu, rrelu, leakyrelu, elu, selu, glu)')
+parser.add_argument('--theta_act', type=str, default='relu',
+                    help='tanh, softplus, relu, rrelu, leakyrelu, elu, selu, glu)')
 parser.add_argument('--train_embeddings', type=int, default=0, help='whether to fix rho or train it')
 
 ### optimization-related arguments
@@ -54,7 +55,8 @@ parser.add_argument('--num_words', type=int, default=10, help='number of words f
 parser.add_argument('--log_interval', type=int, default=2, help='when to log training')
 parser.add_argument('--visualize_every', type=int, default=10, help='when to visualize results')
 parser.add_argument('--eval_batch_size', type=int, default=1000, help='input batch size for evaluation')
-parser.add_argument('--load_from', type=str, default='/home/yiyi/MigrTwi/082021/topic_modeling/results/', help='the name of the ckpt to eval from')
+parser.add_argument('--load_from', type=str, default='/home/yiyi/MigrTwi/082021/topic_modeling/results/',
+                    help='the name of the ckpt to eval from')
 parser.add_argument('--tc', type=int, default=0, help='whether to compute topic coherence or not')
 parser.add_argument('--td', type=int, default=0, help='whether to compute topic diversity or not')
 
@@ -101,7 +103,6 @@ print(f'retrieving test file, length {args.num_docs_test}')
 print(f'retrieving test1 file, length {args.num_docs_test_1}')
 print(f'retrieving test2 file, length {args.num_docs_test_2}')
 
-
 ### load existing embeddings..
 embeddings = None
 if not args.train_embeddings:
@@ -118,17 +119,17 @@ if not args.train_embeddings:
     embeddings = np.zeros((vocab_size, args.emb_size))
     words_found = 0
     for i, word in enumerate(vocab):
-        try: 
+        try:
             embeddings[i] = vectors[word]
             words_found += 1
         except KeyError:
-            embeddings[i] = np.random.normal(scale=0.6, size=(args.emb_size, ))
+            embeddings[i] = np.random.normal(scale=0.6, size=(args.emb_size,))
     embeddings = torch.from_numpy(embeddings).to(device)
     args.embeddings_dim = embeddings.size()
 
-print('=*'*100)
+print('=*' * 100)
 print('Training an Embedded Topic Model on {} with the following settings: {}'.format(args.dataset.upper(), args))
-print('=*'*100)
+print('=*' * 100)
 
 ## define checkpoint
 # if not os.path.exists(args.save_path):
@@ -138,22 +139,22 @@ print('=*'*100)
 if args.mode == 'eval':
     ckpt = args.load_from
 else:
-    ckpt = os.path.join(args.save_path,'etm_{}_K_{}_Htheta_{}_Optim_{}_Clip_{}_ThetaAct_{}_Lr_{}_Bsz_{}_RhoSize_{}_trainEmbeddings_{}'.format(
-        args.dataset, args.num_topics, args.t_hidden_size, args.optimizer, args.clip, args.theta_act, 
-            args.lr, args.batch_size, args.rho_size, args.train_embeddings))
+    ckpt = os.path.join(args.save_path,
+                        'etm_{}_K_{}_Htheta_{}_Optim_{}_Clip_{}_ThetaAct_{}_Lr_{}_Bsz_{}_RhoSize_{}_trainEmbeddings_{}'.format(
+                            args.dataset, args.num_topics, args.t_hidden_size, args.optimizer, args.clip,
+                            args.theta_act,
+                            args.lr, args.batch_size, args.rho_size, args.train_embeddings))
     print(ckpt)
 
 ## define model and optimizer
 model = ETM(args.num_topics, vocab_size, args.t_hidden_size, args.rho_size, args.emb_size,
-             args.theta_act, embeddings, args.train_embeddings, args.enc_drop).to(device)
+            args.theta_act, embeddings, args.train_embeddings, args.enc_drop).to(device)
 
-
-# filepath = "src/topic_modeling/ETM/results/hateXplain/backup/etm_hateXplain_K_18_Htheta_800_Optim_adam_Clip_0.0_ThetaAct_relu_Lr_0.005_Bsz_1000_RhoSize_300_trainEmbeddings_0_val_ppl_1148.2_epoch_137"
+# filepath=""
 # with open(filepath, 'rb') as f:
 #     model = torch.load(f)
 # print('model: {}'.format(model))
 # model.to(device)
-
 
 
 if args.optimizer == 'adam':
@@ -169,6 +170,7 @@ elif args.optimizer == 'asgd':
 else:
     print('Defaulting to vanilla SGD')
     optimizer = optim.SGD(model.parameters(), lr=args.lr)
+
 
 def train(epoch):
     model.train()
@@ -199,38 +201,39 @@ def train(epoch):
         cnt += 1
 
         if idx % args.log_interval == 0 and idx > 0:
-            cur_loss = round(acc_loss / cnt, 2) 
-            cur_kl_theta = round(acc_kl_theta_loss / cnt, 2) 
+            cur_loss = round(acc_loss / cnt, 2)
+            cur_kl_theta = round(acc_kl_theta_loss / cnt, 2)
             cur_real_loss = round(cur_loss + cur_kl_theta, 2)
 
             print('Epoch: {} .. batch: {}/{} .. LR: {} .. KL_theta: {} .. Rec_loss: {} .. NELBO: {}'.format(
                 epoch, idx, len(indices), optimizer.param_groups[0]['lr'], cur_kl_theta, cur_loss, cur_real_loss))
-    
-    cur_loss = round(acc_loss / cnt, 2) 
-    cur_kl_theta = round(acc_kl_theta_loss / cnt, 2) 
+
+    cur_loss = round(acc_loss / cnt, 2)
+    cur_kl_theta = round(acc_kl_theta_loss / cnt, 2)
     cur_real_loss = round(cur_loss + cur_kl_theta, 2)
-    print('*'*100)
+    print('*' * 100)
     print('Epoch----->{} .. LR: {} .. KL_theta: {} .. Rec_loss: {} .. NELBO: {}'.format(
-            epoch, optimizer.param_groups[0]['lr'], cur_kl_theta, cur_loss, cur_real_loss))
-    print('*'*100)
+        epoch, optimizer.param_groups[0]['lr'], cur_kl_theta, cur_loss, cur_real_loss))
+    print('*' * 100)
+
 
 def visualize(m, show_emb=True):
     if not os.path.exists(args.save_path):
         os.makedirs(args.save_path)
 
     m.eval()
-    logvisual = open(os.path.join(args.save_path,'log.txt'), 'a+')
-    queries = ['refugee', 'immigrant',  'syria', 'iran', 'border', 'african', 'asian', 'christian', 'jewish', 'islam']
+    logvisual = open(os.path.join(args.save_path, 'log.txt'), 'a+')
+    queries = ['refugee', 'immigrant', 'syria', 'iran', 'border', 'african', 'asian', 'christian', 'jewish', 'islam']
 
     ## visualize topics using monte carlo
     with torch.no_grad():
-        print('#'*100)
+        print('#' * 100)
         print('Visualize topics...')
         topics_words = []
         gammas = m.get_beta()
         for k in range(args.num_topics):
             gamma = gammas[k]
-            top_words = list(gamma.cpu().numpy().argsort()[-args.num_words+1:][::-1])
+            top_words = list(gamma.cpu().numpy().argsort()[-args.num_words + 1:][::-1])
             topic_words = [vocab[a] for a in top_words]
             topics_words.append(' '.join(topic_words))
             print('Topic {}: {}'.format(k, topic_words))
@@ -238,22 +241,23 @@ def visualize(m, show_emb=True):
 
         if show_emb:
             ## visualize word embeddings by using V to get nearest neighbors
-            print('#'*100)
+            print('#' * 100)
             print('Visualize word embeddings by using output embedding matrix')
             try:
                 embeddings = m.rho.weight  # Vocab_size x E
             except:
-                embeddings = m.rho         # Vocab_size x E
+                embeddings = m.rho  # Vocab_size x E
             neighbors = []
             for word in queries:
                 logvisual.write('word: {} .. neighbors: {}'.format(
                     word, nearest_neighbors(word, embeddings, vocab)))
-                
+
                 print('word: {} .. neighbors: {}'.format(
                     word, nearest_neighbors(word, embeddings, vocab)))
-            print('#'*100)
-    logvisual.write('#'*100)
+            print('#' * 100)
+    logvisual.write('#' * 100)
     logvisual.close()
+
 
 def evaluate(m, source, tc=False, td=False):
     """Compute perplexity on document completion.
@@ -272,7 +276,6 @@ def evaluate(m, source, tc=False, td=False):
             tokens = test_tokens
             counts = test_counts
             print(f' test tokens length {len(tokens)}')
-
 
         ## get \beta here
         beta = m.get_beta()
@@ -299,7 +302,7 @@ def evaluate(m, source, tc=False, td=False):
             preds = torch.log(res)
             ############## loss function
             recon_loss = -(preds * data_batch_2).sum(1)
-            
+
             loss = recon_loss / sums_2.squeeze()
             loss = loss.mean().item()
             acc_loss += loss
@@ -307,9 +310,9 @@ def evaluate(m, source, tc=False, td=False):
 
         cur_loss = acc_loss / cnt
         ppl_dc = round(math.exp(cur_loss), 1)
-        print('*'*100)
+        print('*' * 100)
         print('{} Doc Completion PPL: {}'.format(source.upper(), ppl_dc))
-        print('*'*100)
+        print('*' * 100)
         if tc or td:
             beta = beta.data.cpu().numpy()
             if tc:
@@ -319,6 +322,7 @@ def evaluate(m, source, tc=False, td=False):
                 print('Computing topic diversity...')
                 get_topic_diversity(beta, 25)
         return ppl_dc
+
 
 if args.mode == 'train':
     ## train model on data 
@@ -335,7 +339,7 @@ if args.mode == 'train':
         ###
         val_ppl = evaluate(model, 'val')
         if val_ppl < best_val_ppl:
-            filename = ckpt+'_val_ppl_'+str(val_ppl)+'_epoch_'+str(epoch)
+            filename = ckpt + '_val_ppl_' + str(val_ppl) + '_epoch_' + str(epoch)
             with open(filename, 'wb') as f:
                 print('saving BEST model to', filename)
                 torch.save(model, f)
@@ -344,12 +348,13 @@ if args.mode == 'train':
         else:
             ## check whether to anneal lr
             lr = optimizer.param_groups[0]['lr']
-            if args.anneal_lr and (len(all_val_ppls) > args.nonmono and val_ppl > min(all_val_ppls[:-args.nonmono]) and lr > 1e-5):
+            if args.anneal_lr and (
+                    len(all_val_ppls) > args.nonmono and val_ppl > min(all_val_ppls[:-args.nonmono]) and lr > 1e-5):
                 optimizer.param_groups[0]['lr'] /= args.lr_factor
         if epoch % args.visualize_every == 0:
             visualize(model)
         all_val_ppls.append(val_ppl)
-        
+
     with open(ckpt, 'rb') as f:
         model = torch.load(f)
 
@@ -394,11 +399,11 @@ else:
 
         ## show topics
         beta = model.get_beta()
-        topic_indices = list(np.random.choice(args.num_topics, 10)) # 10 random topics
+        topic_indices = list(np.random.choice(args.num_topics, 10))  # 10 random topics
         print('\n')
-        for k in range(args.num_topics):#topic_indices:
+        for k in range(args.num_topics):  # topic_indices:
             gamma = beta[k]
-            top_words = list(gamma.cpu().numpy().argsort()[-args.num_words+1:][::-1])
+            top_words = list(gamma.cpu().numpy().argsort()[-args.num_words + 1:][::-1])
             topic_words = [vocab[a] for a in top_words]
             print('Topic {}: {}'.format(k, topic_words))
 

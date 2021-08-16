@@ -2,6 +2,6 @@ data/raw
 data/kb
 data/preprocessed
 crawler/config/credentials.yaml
-populate_ontology/input
-populate_ontology/output
+populate_kb/input
+populate_kb/output
 models
