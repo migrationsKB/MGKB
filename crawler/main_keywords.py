@@ -1,17 +1,17 @@
 import os
 import gzip
 from datetime import datetime
-import time
 import json
 from glob import glob
 from collections import OrderedDict
+import time
 
 import requests
 import numpy as np
 import pandas as pd
 
 from utils.api_authen import load_academic_research_brearer
-from utils.utils import get_params, load_keywords_for_lang
+from utils.utils import get_params
 
 
 def get_last_start_time(dir):
@@ -55,17 +55,16 @@ def query_main(api_name, country_iso2, keywords, idx, lang, start_year, end_year
 
     tweets_fields, poll_fields, media_fields, user_fields, place_fields, tweets_expansions = get_params(cwd)
 
-
     startdate = start_year + '-01-01T00:00:00.00Z'
     # change end time accordingly.
-    enddate = end_year + '-08-02T00:00:00.00Z'
+    # TODO    enddate = end_year + '-08-02T00:00:00.00Z'
     # set up start_time and end_time parameters in API call
     # max_results, to maximum 500
 
     # check if the data dir for a country exists.
     # idx batch of keywords
     keywords_ = keywords[idx]
-    output_dir_root = os.path.join(cwd, 'data', '3rd-round-data', country_iso2)
+    output_dir_root = os.path.join(cwd, 'data', 'raw', '3rd-round-data', country_iso2)
     if not os.path.exists(output_dir_root):
         os.mkdir(output_dir_root)
 
@@ -77,7 +76,7 @@ def query_main(api_name, country_iso2, keywords, idx, lang, start_year, end_year
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
 
-
+    # query, geo country code, no retweets, no promotion.
     query = "({}) has:geo place_country:{} -is:retweet -is:nullcast".format(
         ' OR '.join(keywords_), country_iso2)
     print(query)
@@ -110,7 +109,7 @@ def query_main(api_name, country_iso2, keywords, idx, lang, start_year, end_year
 
     # https://github.com/twitterdev/Twitter-API-v2-sample-code/blob/main/Full-Archive-Search/full-archive-search.py
     headers = {"Authorization": "Bearer {}".format(brear_token),
-               "User-Agent": "v2FullArchiveSearchPython" }
+               "User-Agent": "v2FullArchiveSearchPython"}
 
     ###################query################################
     # connect to end point.
@@ -120,6 +119,7 @@ def query_main(api_name, country_iso2, keywords, idx, lang, start_year, end_year
 
 
 def main(api_name, country_iso2, keywords, idx, lang, start_year, end_year, flag=True):
+    cwd = os.getcwd()
     t = datetime.today().strftime('%Y%m%d%H%M%S')
     response, output_dir, country_iso2 = query_main(api_name, country_iso2, keywords, idx, lang, start_year,
                                                     end_year)
@@ -127,9 +127,8 @@ def main(api_name, country_iso2, keywords, idx, lang, start_year, end_year, flag
 
         if response.status_code == 200:
 
-            #### data #######
+            # data
             data = response.json()
-
             data_json = json.dumps(data) + '\n'
             data_encoded = data_json.encode('utf-8')
 
@@ -147,34 +146,53 @@ def main(api_name, country_iso2, keywords, idx, lang, start_year, end_year, flag
                     print('writing tweets to ', outputfile, '....')
                     outputfile.write(data_encoded)
                 if flag:
+                    time.sleep(5)
                     main(api_name, country_iso2, keywords, idx, lang, start_year, end_year, flag=True)
                 print('*' * 100)
+                ### TODO: CODES HERE GO INTO LOOPS, FIX. WITH THE LAST INDEX
+
             except Exception:
-                if idx < 58:
+                if idx < 57:
                     idx += 1
                     print('idx:', idx)
+                    time.sleep(5)
                     main(api_name, country_iso2, keywords, idx, lang, start_year, end_year, flag=True)
                 else:
                     break
 
-        else:
-            # response code ==429, rate limit exceeded. 100 api calls finished, wait another hour.
+        # else:
+        # response code ==429, rate limit exceeded. 100 api calls finished, wait another 15 minutes.
+        # or too many requests
+        elif response.status_code == 429:
+            if "Rate limit exceeded" in response.text:
+                flag = False
+                print(response.text)
+                Exception(response.status_code, response.text)
+                exit()
 
+            else:
+                print(response.text)
+                output_dir_root = os.path.join(cwd, 'data', 'raw', '3rd-round-data', country_iso2)
+                max_id = sorted([int(x) for x in os.listdir(output_dir_root)])[-1]
+                print('max id ', max_id)
+                time.sleep(5)
+                main(api_name, country_iso2, keywords, max_id, lang, start_year, end_year, flag=True)
+        else:
             flag = False
-            raise Exception(response.status_code, response.text)
+            print(response.text)
+            Exception(response.status_code, response.text)
 
 
 if __name__ == '__main__':
     # import plac
     # plac.call(call_main)
-    destination_countries = ['GB']
-    # finished :PL, GB, NL, DE, CH, AT, ES, FR, HU,IT, SE
-    # for country in destination_countries:
-    # keywords_list = get_keywords_by_category()
-    # keywords_chunks = list(chunks(keywords_list, 40))
+
+    # finished :GB DE PL CH AT FR NL ES IT
+    # PL, GB, NL, DE, CH, AT, ES, FR, HU,IT, SE
+
+    # 1st round keywords+hashtags+hatespeech keywords from Zhang 2018
     with open('data/extracted/keywords_chunked_all.json') as file:
         keywords_chunks = json.load(file)
-    # idx =
-    # main('itflowsapi', 'GB', keywords_chunks, idx, 'en', '2021', '2022')
-    for x in range(42, 58):
-        main('itflowsapi', 'GB', keywords_chunks, x, 'en', '2021', '2021')
+
+    for x in range(0, 58 ):
+        main('itflowsapi', 'SE', keywords_chunks, x, 'en', '2021', '2021')
