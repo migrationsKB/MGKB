@@ -74,8 +74,9 @@
 * pre-trained HSD model: `models/HSD/model_epoch_1.pth`
 
 ### 7. Eurostats
+All the csv files are in `data/eurostat_stats/csv`
 
-
+Refer to `data/eurostat_stats/README.md` for references.
 
 ### 8. Post Processing
 * Filter the tweets with refined topics.
