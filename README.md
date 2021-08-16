@@ -6,6 +6,12 @@
 ## RDFS Model
 ![](images/migrationKB_schema.jpg)
 
+
+## Links
+* pretrained DL models and nt files for **MGKB** can be found on [Zenodo](https://zenodo.org/record/5205418#.YRodzXUza0o)
+* [Website](https://migrationskb.github.io/MGKB/) for statistics and examples of SPARQL queries
+
+
 ## Pipeline
 
 ### 1. Extracting Tweets and Metadata
@@ -75,8 +81,7 @@
 * Filter the tweets with refined topics.
   * relevant topics: 
     * [ 0,1,2,3,5,8,12,13,15,16,18,22,24,25, 29,32,34,36,41,42,45,47,48]
-  * show the topics and topic words
-    * ![](topic_modeling/topic_words/topicwords_50.json)
+  * [topics and topic words](https://github.com/migrationsKB/MGKB/tree/master/topic_modeling/topic_words)
   
 
 ### 8. KB population
