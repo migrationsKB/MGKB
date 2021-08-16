@@ -1,0 +1,30 @@
+size of df: 397537
+counting document frequency of words...
+building the vocabulary...
+  initial vocabulary size: 22850
+  vocabulary size 22850
+tokenizing documents and splitting into train/test/valid...
+  vocabulary after removing words not in train: 22850
+  number of documents (train): 318029 [this should be equal to 318029]
+  number of documents (valid): 19876 [this should be equal to 19876]
+  number of documents (test): 59632 [this should be equal to 59632]
+  number of documents (train): 317941 [compare to before 318029]
+  number of documents (valid): 19871 [compare to before 19876]
+  number of documents (test): 59611 [compare to before 59632]
+splitting test documents in 2 halves...
+test_data_h1 len 59395
+test_data_h1 len 59395
+creating lists of words...
+[17663, 5978, 22011, 14697, 13595, 17222, 2286, 2901, 1842, 17742]
+  len(words_tr):  3528344
+  len(words_ts):  659040
+  len(words_ts_h1):  314758
+  len(words_ts_h2):  344282
+  len(words_va):  221091
+getting doc indices...
+  len(np.unique(doc_indices_tr)): 317941 [this should be 317941]
+  len(np.unique(doc_indices_ts)): 59395 [this should be 59395]
+  len(np.unique(doc_indices_ts_h1)): 59395 [this should be 59395]
+  len(np.unique(doc_indices_ts_h2)): 59395 [this should be 59395]
+  len(np.unique(doc_indices_va)): 19871 [this should be 19871]
+creating bow representations

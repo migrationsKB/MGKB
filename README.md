@@ -8,7 +8,7 @@
 
 
 ## Links
-* pretrained DL models and nt files for **MGKB** can be found on [Zenodo](https://zenodo.org/record/5205418#.YRodzXUza0o)
+* pretrained DL models and nt files for **MGKB** can be found on [Zenodo](https://zenodo.org/record/5206820#.YRqF1nUza0o)
 * [Website](https://migrationskb.github.io/MGKB/) for statistics and examples of SPARQL queries
 
 
