@@ -35,6 +35,9 @@
             ```
 
 ### 3. Topic Modeling (ETM)
+source code: https://github.com/adjidieng/ETM (This is code that accompanies the paper titled "Topic Modeling in Embedding Spaces" by Adji B. Dieng, Francisco J. R. Ruiz, and David M. Blei. (Arxiv link: https://arxiv.org/abs/1907.04907))
+
+
 * a) build data
   * `python -m topic_modeling.ETM.data_build_tweets`
   * input: preprocessed texts, output: bows and vocab pickle.
@@ -56,6 +59,8 @@
 
 
 ### 4. Entity Linking (Blink)
+source code: https://github.com/facebookresearch/BLINK (refer to paper by  Ledell Wu, Fabio Petroni, Martin Josifoski, Sebastian Riedel, Luke Zettlemoyer titled "Zero-shot Entity Linking with Dense Entity Retrieval" https://arxiv.org/pdf/1911.03814.pdf)
+
 * a) set up Blink, and initialize the path in `entity_linking/main_linking.py` file
   * Go to [Blink](https://github.com/facebookresearch/BLINK)
 * b) entity linking for tweets
@@ -66,6 +71,7 @@
   
 
 ### 5. Sentiment Analysis
+
 * `python -m sentiment_analysis.transfer_learning`
 * pre-trained bert model: `models/Bert/BERT_6.bin`
 
