@@ -1,6 +1,7 @@
 data/raw
 data/kb
 data/preprocessed
+data/etm_data
 crawler/config/credentials.yaml
 populate_kb/input
 populate_kb/output
