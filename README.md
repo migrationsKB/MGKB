@@ -10,7 +10,8 @@
 ## Links
 * pretrained DL models and nt files for **MGKB** can be found on [Zenodo](https://zenodo.org/record/5206820#.YRqF1nUza0o)
 * [Website](https://migrationskb.github.io/MGKB/) for statistics and examples of SPARQL queries
-
+* preprint: Yiyi Chen, Harald Sack, Mehwish Alam, **MigrationsKB: A Knowledge Base of Public Attitudes towards Migrations and their Driving Factors**
+  ([https://arxiv.org/abs/2108.07593](https://arxiv.org/abs/2108.07593))
 
 ## Pipeline
 
@@ -35,7 +36,7 @@
             ```
 
 ### 3. Topic Modeling (ETM)
-source code: https://github.com/adjidieng/ETM (This is code that accompanies the paper titled "Topic Modeling in Embedding Spaces" by Adji B. Dieng, Francisco J. R. Ruiz, and David M. Blei. (Arxiv link: https://arxiv.org/abs/1907.04907))
+**Source code**: https://github.com/adjidieng/ETM (This is code that accompanies the paper titled "Topic Modeling in Embedding Spaces" by Adji B. Dieng, Francisco J. R. Ruiz, and David M. Blei. (Arxiv link: https://arxiv.org/abs/1907.04907))
 
 
 * a) build data
@@ -59,7 +60,7 @@ source code: https://github.com/adjidieng/ETM (This is code that accompanies the
 
 
 ### 4. Entity Linking (Blink)
-source code: https://github.com/facebookresearch/BLINK (refer to paper by  Ledell Wu, Fabio Petroni, Martin Josifoski, Sebastian Riedel, Luke Zettlemoyer titled "Zero-shot Entity Linking with Dense Entity Retrieval" https://arxiv.org/pdf/1911.03814.pdf)
+**Source code**: https://github.com/facebookresearch/BLINK (refer to paper by  Ledell Wu, Fabio Petroni, Martin Josifoski, Sebastian Riedel, Luke Zettlemoyer titled "Zero-shot Entity Linking with Dense Entity Retrieval" https://arxiv.org/pdf/1911.03814.pdf)
 
 * a) set up Blink, and initialize the path in `entity_linking/main_linking.py` file
   * Go to [Blink](https://github.com/facebookresearch/BLINK)
@@ -96,3 +97,16 @@ Refer to `data/eurostat_stats/README.md` for references.
   * `python 01_populate_kb.py`
 * Generate Documentation for RDF schema
   * `python 02_document_schema.py`
+
+
+## Cite our Work
+```
+@misc{chen2021migrationskb,
+      title={MigrationsKB: A Knowledge Base of Public Attitudes towards Migrations and their Driving Factors}, 
+      author={Yiyi Chen and Harald Sack and Mehwish Alam},
+      year={2021},
+      eprint={2108.07593},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
