@@ -47,7 +47,7 @@
   * input: preprocessed texts, output: embeddings.txt
 * c) train ETM
   * `python -m topic_modeling.ETM.main --num_topics XX`
-  * For our experiments, ETM was trained with the number of topics 25/50/75
+  * For our experiments, ETM was trained with the number of topics 25/50/75/100
   * output: ETM models
 * d) evaluate ETM
   * `python -m topic_modeling.ETM.main --num_topics 50 --load_from topic_modeling/ETM/models/etm_hateXplain_K_50_Htheta_800_Optim_adam_Clip_0.0_ThetaAct_relu_Lr_0.005_Bsz_1000_RhoSize_300_trainEmbeddings_0_val_ppl_3015.1_epoch_172 --tc 1 --td 1 --mode eval`
