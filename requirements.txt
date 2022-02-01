@@ -18,9 +18,6 @@ seaborn==0.11.1
 spacy==3.2.1
 tensorflow
 termcolor==1.1.0
-torch==1.8.1+cu101
-torchaudio==0.8.1
-torchvision==0.9.1+cu101
 tqdm==4.62.3
 transformers==4.16.1
 transformers.egg==info
