@@ -19,10 +19,12 @@ spacy==3.2.1
 tensorflow==2.7.0
 tensorflow_macos==2.7.0
 termcolor==1.1.0
-torch==1.6.0
-torchvision==0.7.0
+torch==1.8.1+cu101
+torchaudio==0.8.1
+torchvision==0.9.1+cu101
 tqdm==4.62.3
 transformers==4.16.1
 transformers.egg==info
 tweepy==4.5.0
 tweet-preprocessor==0.6.0
+huggingface-hub==0.2.1
