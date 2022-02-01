@@ -14,6 +14,14 @@
   ([https://arxiv.org/abs/2108.07593](https://arxiv.org/abs/2108.07593))
 * ❓ [SPARQL endpoint](https://mgkb.fiz-karlsruhe.de/sparql/)
 
+## Install required libraries and packages
+* pytorch (
+  * Choose the right version of pytorch according to CUDA
+  * For the settings (CUDA version 10.1, Driver Version: 418.39 and NVIDIA-SMI 418.39):
+    *  `pip install torch==1.8.1+cu101 torchvision==0.9.1+cu101 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html`
+*   `pip install -r requirements.txt`
+
+
 ## Pipeline
 
 ### 1. Extracting Tweets and Metadata
