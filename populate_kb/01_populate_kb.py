@@ -7,7 +7,9 @@ import pandas as pd
 import numpy as np
 import uuid
 
-from rdflib.namespace import Namespace, RDF
+from rdflib.namespace import Namespace
+from rdflib.namespace import DC, DCTERMS, OWL, RDF, RDFS, XMLNS, XSD, TIME
+
 from rdflib import URIRef, Literal
 
 ### load the graph from current owl file.
@@ -18,13 +20,11 @@ g.parse('input/migrationsKB_schema.ttl', format='ttl')
 # define namespace
 sioc = Namespace('http://rdfs.org/sioc/ns#')
 sioc_t = Namespace('http://rdfs.org/sioc/types#')
-rdfs = Namespace('http://www.w3.org/2000/01/rdf-schema#')
-rdf = Namespace('https://www.w3.org/1999/02/22-rdf-syntax-ns#')
 nee = Namespace('http://www.ics.forth.gr/isl/oae/core#')
 schema = Namespace('http://schema.org/')
 onyx = Namespace('http://www.gsi.dit.upm.es/ontologies/onyx/ns#')
 wna = Namespace('http://www.gsi.dit.upm.es/ontologies/wnaffect/ns#')
-dc = Namespace('http://purl.org/dc/elements/1.1/')
+lcc_lr = Namespace("https://www.omg.org/spec/LCC/Languages/LanguageRepresentation/")
 fibo_ind_ei_ei = Namespace('https://spec.edmcouncil.org/fibo/ontology/IND/EconomicIndicators/EconomicIndicators/')
 fibo_fnd_dt_fd = Namespace('https://spec.edmcouncil.org/fibo/ontology/FND/DatesAndTimes/FinancialDates/')
 fibo_fnd_rel_rel = Namespace('https://spec.edmcouncil.org/fibo/ontology/FND/Relations/Relations/')
@@ -32,26 +32,37 @@ fibo_fnd_utl_alx = Namespace('https://spec.edmcouncil.org/fibo/ontology/FND/Util
 fibo_fnd_arr_doc = Namespace('https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Documents/')
 fibo_fnd_arr_rep = Namespace('https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Reporting/')
 fibo_fnd_arr_asmt = Namespace('https://spec.edmcouncil.org/fibo/ontology/FND/Arrangements/Assessments/')
+fibo_fnd_acc_cat = Namespace("https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/")
+cidoc_crm = Namespace("https://cidoc-crm.org/html/cidoc_crm_v7.1.1.html#")
 prov = Namespace('https://www.w3.org/TR/prov-o/#')
 MGKB = "https://migrationsKB.github.io/MGKB#"
 mgkb = Namespace(MGKB)
 
 ## binding
 g.bind('mgkb', mgkb)
-g.bind("sioc", sioc)
-g.bind("sioc_t", sioc_t)
-g.bind('rdf', rdf)
-g.bind("rdfs", rdfs)
+g.bind("dcterms", DCTERMS)
+g.bind("dc", DC)
+g.bind("owl", OWL)
+g.bind("rdf", RDF)
 g.bind("wna", wna)
-g.bind("nee", nee)
-g.bind("dc", dc)
-g.bind("schema", schema)
+g.bind("xml", XMLNS)
+g.bind("xsd", XSD)
 g.bind("onyx", onyx)
+g.bind("prov", prov)
+g.bind("rdfs", RDFS)
+g.bind("sioc", sioc)
+g.bind("lcc-lr", lcc_lr)
+g.bind("schema", schema)
+g.bind("sioc_t", sioc_t)
+g.bind("cidoc-crm", cidoc_crm)
+g.bind("nee", nee)
 g.bind("fibo-ind-ei-ei", fibo_ind_ei_ei)
 g.bind("fibo-fnd-dt-fd", fibo_fnd_dt_fd)
 g.bind("fibo-fnd-rel-rel", fibo_fnd_rel_rel)
 g.bind("fibo-fnd-utl-alx", fibo_fnd_utl_alx)
 g.bind("fibo-fnd-arr-doc", fibo_fnd_arr_doc)
+g.bind("fibo-fnd-acc-cat", fibo_fnd_acc_cat)
+g.bind("fibo-fnd-arr-asmt", fibo_fnd_arr_asmt)
 
 ### defined individuals
 neutral_emotion = URIRef('http://www.gsi.dit.upm.es/ontologies/wnaffect/ns#neutral-emotion')
@@ -64,6 +75,7 @@ normal_speech = mgkb.normal
 
 youth_unemployed_population = URIRef(MGKB + 'youth-unemployed-population')
 total_unemployed_population = URIRef(MGKB + 'total-unemployed-population')
+lt_unemoloyed_population = URIRef(MGKB + 'long-term-unemployed-population')
 
 statista = mgkb.statista
 eurostat = mgkb.eurostat
@@ -81,6 +93,9 @@ g.add((assessment_activity_eurostat, prov.wasAssociatedWith, eurostat))
 g.add((assessment_activity_ons, prov.wasAssociatedWith, ONS))
 g.add((assessment_activity_ukparliament, prov.wasAssociatedWith, UKParliament))
 
+years = [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+countries = ["AT", "DE", "GB", "ES", "PL", "FR", "SE", "HU", "CH", "NL", "IT"]
+
 
 def define_entity_resources(entities_dict):
     """
@@ -95,93 +110,137 @@ def define_entity_resources(entities_dict):
         g.add((ent_instance, schema.description, Literal(ent_description)))
 
 
-def define_economic_indicators():
-    real_gdp_r = pd.read_csv('../data/eurostat_stats/csv/real_gdp_growth_rate.csv',
-                             index_col=0)
-    total_unemployment_rate = pd.read_csv('../data/eurostat_stats/csv/unemployment_rate.csv',
-                                          index_col=0)
-    youth_unemployment_rate = pd.read_csv(
-        '../data/eurostat_stats/csv/youth_unemployment_rate.csv', index_col=0)
+def get_unemployment_rate():
+    # long-term unemployment rate
+    lt_unemployment_file = "../data/eurostat_stats/lt_unemployment.csv"
+    lt_unemployment = pd.read_csv(lt_unemployment_file)
+    # date for long term unemployment
+    lt_unemployment_date_instance = URIRef(MGKB + 'long-term_unemployment_eurostat_report_date')  # rgdpr eurostat
+    g.add((lt_unemployment_date_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
+    g.add((lt_unemployment_date_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2021-09-10')))
+    # duration for unemployment
+    lt_duration = URIRef(MGKB + 'long-term_unemployment_duration')
+    g.add((lt_duration, RDF.type, fibo_fnd_dt_fd.Duration))
+    g.add((lt_duration, fibo_fnd_dt_fd.hasDurationValue, Literal("12 months and more")))
 
-    rgdpr_dict = real_gdp_r.to_dict()
-    total_ur = total_unemployment_rate.to_dict()
-    youth_ur = youth_unemployment_rate.to_dict()
+    for year in years:
+        for country in countries:
+            if country == "GB":
+                rate = lt_unemployment.loc[(lt_unemployment["TIME"] == year) & (lt_unemployment["GEO"] == "UK")]["Value"]
+                rate = float(rate)
+            else:
+                rate = lt_unemployment.loc[(lt_unemployment["TIME"] == year) & (lt_unemployment["GEO"] == country)]["Value"]
+                rate = float(rate)
 
+            lt_unemployment_instance = URIRef(MGKB + 'long-term_unemployment_' + country + '_' + str(year))
+            g.add((lt_unemployment_instance, RDF.type, mgkb.LongTermUnemploymentRate))  # instance
+            g.add((lt_unemployment_instance, fibo_fnd_utl_alx.hasArgument, lt_unemoloyed_population))  # has population
+            g.add((lt_unemployment_instance, fibo_ind_ei_ei.hasDurationOfUnemployment, lt_duration))  # has duration
+            g.add((lt_unemployment_instance, dc.date, Literal(year)))  # hasDate
+            g.add((lt_unemployment_instance, schema.addressCountry, Literal(country)))  # addressCountry
+            g.add((lt_unemployment_instance, fibo_ind_ei_ei.hasIndicatorValue, Literal(rate)))  # hasIndicatorValue
+
+    # youth unemployment rate
+    yt_unemployment_file = "../data/eurostat_stats/youth_unemployment.csv"
+    yt_unemployment = pd.read_csv(yt_unemployment_file)
+    # date for youth unemployment
+    youth_unemployment_date_instance = URIRef(MGKB + 'youth_unemployment_eurostat_report_date')  # rgdpr eurostat
+    g.add((youth_unemployment_date_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
+    g.add((youth_unemployment_date_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2022-01-27')))
+
+    for year in years:
+        for country in countries:
+            if country != "GB":
+                rate = yt_unemployment.loc[(yt_unemployment["TIME"] == year) & (yt_unemployment["country"] == country)]["Value"]
+                rate = float(rate)
+                youth_unemployment_instance = URIRef(MGKB + 'youth_unemployment_' + country + '_' + str(year))
+                g.add((youth_unemployment_instance, RDF.type, mgkb.YouthUnemploymentRate))
+                g.add((youth_unemployment_instance, fibo_fnd_utl_alx.hasArgument,
+                       youth_unemployed_population))  # has population
+                g.add((youth_unemployment_instance, dc.date, Literal(year)))  # hasDate
+                g.add((youth_unemployment_instance, schema.addressCountry, Literal(country)))  # addressCountry
+                g.add((youth_unemployment_instance, fibo_ind_ei_ei.hasIndicatorValue, Literal(rate)))  # hasIndicatorValue
+                g.add((youth_unemployment_instance, fibo_fnd_arr_rep.hasReportDate, youth_unemployment_date_instance))
+
+    # total unemployment rate
+    total_unemployment_file = "../data/eurostat_stats/total_unemployment.csv"
+    total_unemployment = pd.read_csv(total_unemployment_file)
+    total_unemployment = total_unemployment[total_unemployment["unit"] == "PC_ACT"]
+
+    # date for total unemployment
+    total_unemployment_date_instance = URIRef(MGKB + 'total_unemployment_eurostat_report_date')  # total unemployment eurostat
+    g.add((total_unemployment_date_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
+    g.add((total_unemployment_date_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2022-01-27')))
+
+    for year in years:
+        for country in countries:
+            if country != "GB":
+                rate = total_unemployment.loc[total_unemployment["country"] == cuntry][country]
+                rate = float(rate)
+                total_unemployment_instance = URIRef(MGKB + 'total_unemployment_' + country + '_' + str(year))
+                g.add((total_unemployment_instance, RDF.type, mgkb.TotalUnemploymentRate))
+                g.add((total_unemployment_instance, fibo_fnd_utl_alx.hasArgument,
+                       total_unemployed_population))  # has population
+                g.add((total_unemployment_instance, dc.date, Literal(year)))  # hasDate
+                g.add((total_unemployment_instance, schema.addressCountry, Literal(country)))  # addressCountry
+                g.add(
+                    (total_unemployment_instance, fibo_ind_ei_ei.hasIndicatorValue, Literal(rate)))  # hasIndicatorValue
+                g.add((total_unemployment_instance, fibo_fnd_arr_rep.hasReportDate, total_unemployment_date_instance))
+
+
+def get_income(file="../data/eurostat_stats/income.csv"):
+    # no UK data
+    income_df = pd.read_csv(file)
+    income_report_date_eurostate_instance = URIRef(MGKB + 'income_eurostat_report_date')  # rgdpr eurostat
+    g.add((income_report_date_eurostate_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
+    g.add((income_report_date_eurostate_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2021-10-13')))
+
+    currency_instance = URIRef(MGKB+'currency_euro')
+    g.add((currency_instance, RDF.type, fibo_fnd_acc_cat.Currency))
+    g.add((currency_instance, lcc_lr.hasName, Literal("Euro")))
+
+    for year in years:
+        for country in countries:
+            if country != "GB":
+                rate = income_df.loc[(income_df["country"] == country) & (income_df["TIME"] == year)]["Value"]
+                rate = int(rate)
+
+                income_instance = URIRef(MGKB + 'income_' + country + '_' + str(year))
+                g.add((income_instance, RDF.type, mgkb.DisposableIncome))  # type DisposableIncome
+                g.add((income_instance, schema.addressCountry, Literal(country)))  # schema.addressCountry
+                g.add((income_instance, dc.date, Literal(year)))  # dc.date
+                # money amount
+                money_amount_instance = URIRef(MGKB + 'money_amount_' + country + '_' + str(year))
+                g.add((money_amount_instance, RDF.type, fibo_fnd_acc_cat.MonetaryAmount))
+                g.add((money_amount_instance, fibo_fnd_acc_cat.hasAmount, Literal(rate)))
+                g.add((money_amount_instance, fibo_fnd_acc_cat.hasCurrency, currency_instance))
+                g.add((income_instance, fibo_fnd_arr_rep.hasReportDate, income_report_date_eurostate_instance))  # hasReportDate
+
+
+def real_gdpr(file="../data/eurostat_stats/gdpr.csv"):
+    # has UK data until 2020
+    rgdpr = pd.read_csv(file)
     # report date instances.
     rgdpr_report_date_eurostat_instance = URIRef(MGKB + 'rgdpr_eurostat_report_date')  # rgdpr eurostat
     g.add((rgdpr_report_date_eurostat_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
-    g.add((rgdpr_report_date_eurostat_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2021-05-12')))
+    g.add((rgdpr_report_date_eurostat_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2022-01-27')))
 
-    rgdpr_report_date_GB_2020_instance = URIRef(MGKB + 'rgdpr_gb_2020_report_date')
-    g.add((rgdpr_report_date_GB_2020_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
-    g.add((rgdpr_report_date_GB_2020_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2021-03-31')))
-
-    ### real gdp growth rate.
-    for country, year_dict in rgdpr_dict.items():
-        for year, rate in year_dict.items():
-            rgdpr_instance = URIRef(MGKB + 'rgdpr_' + country + '_' + str(year))
-            g.add((rgdpr_instance, RDF.type, fibo_ind_ei_ei.GrossDomesticProduct))
-            g.add((rgdpr_instance, fibo_ind_ei_ei.hasIndicatorValue, Literal(rate)))  # hasIndicatorValue.
-            g.add((rgdpr_instance, schema.addressCountry, Literal(country)))  # schema.addressCountry
-            g.add((rgdpr_instance, dc.date, Literal(year)))  # dc.date
-            if year == 2020 and country == 'GB':
-                g.add((rgdpr_instance, prov.wasGeneratedBy, statista))
-                g.add((rgdpr_instance, fibo_fnd_arr_rep.hasReportDate,
-                       rgdpr_report_date_GB_2020_instance))  # hasReportDate
+    for year in years:
+        for country in countries:
+            if country == "GB":
+                rate = float(rgdpr.loc[rgdpr['country'] == "UK"][str(year)])
             else:
+                rate = float(rgdpr.loc[rgdpr['country'] == country][str(year)])
+            if str(rate) != 'nan':
+                # gdpr instance.
+                rgdpr_instance = URIRef(MGKB + 'rgdpr_' + country + '_' + str(year))
+                # the instance is instantiated GrossDomesticProduct
+                g.add((rgdpr_instance, RDF.type, fibo_ind_ei_ei.GrossDomesticProduct))
+                g.add((rgdpr_instance, fibo_ind_ei_ei.hasIndicatorValue, Literal(rate)))  # hasIndicatorValue.
+                g.add((rgdpr_instance, schema.addressCountry, Literal(country)))  # schema.addressCountry
+                g.add((rgdpr_instance, dc.date, Literal(year)))  # dc.date
                 g.add((rgdpr_instance, prov.wasGeneratedBy, eurostat))
                 g.add((rgdpr_instance, fibo_fnd_arr_rep.hasReportDate, rgdpr_report_date_eurostat_instance))
-
-    ### total unemployment rate report date instances
-    tur_report_date_eurostat_instance = URIRef(MGKB + 'tur_eurostat_report_date')  # total unemployment eurostat
-    g.add((tur_report_date_eurostat_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
-    g.add((tur_report_date_eurostat_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2021-04-13')))
-
-    tur_report_date_GB_2020_instance = URIRef(MGKB + 'tur_gb_2020_report_date')  # total unemployment gb
-    g.add((tur_report_date_GB_2020_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
-    g.add((tur_report_date_GB_2020_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2021-01-26')))
-
-    for country, year_dict in total_ur.items():
-        for year, rate in year_dict.items():
-            tur_instance = URIRef(MGKB + 'tur_' + country + '_' + str(year))
-            g.add((tur_instance, RDF.type, mgkb.TotalUnemploymentRate))
-            g.add((tur_instance, fibo_fnd_utl_alx.hasArgument, total_unemployed_population))
-            # data properties
-            g.add((tur_instance, fibo_ind_ei_ei.hasIndicatorValue, Literal(rate)))  # hasIndicatorValue.
-            g.add((tur_instance, schema.addressCountry, Literal(country)))  # schema.addressCountry
-            g.add((tur_instance, dc.date, Literal(year)))  # dc.date
-            if year == 2020 and country == 'GB':
-                g.add((tur_instance, prov.wasGeneratedBy, ONS))
-                g.add((tur_instance, fibo_fnd_arr_rep.hasReportDate, tur_report_date_GB_2020_instance))
-            else:
-                g.add((tur_instance, prov.wasGeneratedBy, eurostat))
-                g.add((tur_instance, fibo_fnd_arr_rep.hasReportDate, tur_report_date_eurostat_instance))
-
-    ### total unemployment rate report date instances
-    yur_report_date_eurostat_instance = URIRef(MGKB + 'yur_eurostat_report_date')  # total unemployment eurostat
-    g.add((yur_report_date_eurostat_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
-    g.add((yur_report_date_eurostat_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2021-04-13')))
-
-    yur_report_date_GB_2020_instance = URIRef(MGKB + 'yur_gb_2020_report_date')  # total unemployment gb
-    g.add((yur_report_date_GB_2020_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
-    g.add((yur_report_date_GB_2020_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2021-04-20')))
-
-    for country, year_dict in youth_ur.items():
-        for year, rate in year_dict.items():
-            yur_instance = URIRef(MGKB + 'yur_' + country + '_' + str(year))
-            g.add((yur_instance, RDF.type, mgkb.YouthUnemploymentRate))
-            g.add((yur_instance, fibo_fnd_utl_alx.hasArgument, youth_unemployed_population))  # hasArgument
-            g.add((yur_instance, fibo_ind_ei_ei.hasIndicatorValue, Literal(rate)))  # hasIndicatorValue
-            g.add((yur_instance, schema.addressCountry, Literal(country)))  # schema.addressCountry
-            g.add((yur_instance, dc.date, Literal(year)))  # dc.date
-            if year == 2020 and country == 'GB':
-                g.add((yur_instance, prov.wasGeneratedBy, UKParliament))
-                g.add((yur_instance, fibo_fnd_arr_rep.hasReportDate, yur_report_date_GB_2020_instance))
-            else:
-                g.add((yur_instance, prov.wasGeneratedBy, eurostat))
-                g.add((yur_instance, fibo_fnd_arr_rep.hasReportDate, yur_report_date_eurostat_instance))
-
-    return rgdpr_dict, total_ur, youth_ur
 
 
 def add_triples_for_one_tweet(g, row, entities_dict):
@@ -360,9 +419,9 @@ if __name__ == '__main__':
     df.dropna(subset=['created_at'], inplace=True)
     df.dropna(subset=['country_code'], inplace=True)
     df = df[df['topic_immig_max_score'] > 0.45]
-    df['Year'] = [int(x) for x in df['created_at'].str.slice(stop=4)] #200k
+    df['Year'] = [int(x) for x in df['created_at'].str.slice(stop=4)]  # 200k
     for year in [2021]:
-        df_year = df[df['Year']==year]
+        df_year = df[df['Year'] == year]
 
         print(f'len of df: {len(df_year)}')  # 307339
 
