@@ -97,6 +97,14 @@ years = [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
 countries = ["AT", "DE", "GB", "ES", "PL", "FR", "SE", "HU", "CH", "NL", "IT"]
 
 
+def define_topics(topic_dict):
+    for topic_id, topic_words_ls in topic_dict.items():
+        topic_words = ",".join(topic_words_ls)
+        topic_instance = URIRef(MGKB + f'topic_{topic_id}')
+        g.add((topic_instance, RDF.type, sioc_t.Category))
+        g.add((topic_instance, RDFS.label, Literal(topic_words)))
+
+
 def define_entity_resources(entities_dict):
     """
     rdfs:Resource (wikipedia urls)
@@ -106,7 +114,7 @@ def define_entity_resources(entities_dict):
         ent_label = ent_dict['entity']
         ent_description = ent_dict['description']
         g.add((ent_instance, RDF.type, rdfs.Resource))  # individual of rdfs.Resource
-        g.add((ent_instance, rdfs.label, Literal(ent_label)))
+        g.add((ent_instance, RDFS.label, Literal(ent_label)))
         g.add((ent_instance, schema.description, Literal(ent_description)))
 
 
@@ -355,7 +363,7 @@ def add_triples_for_one_tweet(g, row, entities_dict):
     g.add((instance, sioc.id, Literal(idx)))  # add sioc:id
     created_at = row['created_at']  # date created
     if created_at is not None:
-        g.add((instance, dc.created, Literal(created_at)))  # add dc:created
+        g.add((instance, DCTERMS.created, Literal(created_at)))  # add dc:created
     # u_id for ontology
     u_id_gen = row['author_id_gen']  # add userAccount
     # user_id
@@ -404,7 +412,8 @@ def add_triples_for_one_tweet(g, row, entities_dict):
         for mid, user_mention in user_mentions_id_dict.items():
             user_mention_instance = URIRef(MGKB + mid)
             g.add((user_mention_instance, RDF.type, sioc.UserAccount))
-            g.add((user_mention_instance, sioc.name, Literal(uuid.uuid4())))
+            # g.add((user_mention_instance, sioc.name, Literal(uuid.uuid4())))
+            g.add((user_mention_instance, sioc.name, Literal(user_mention)))
             g.add((instance, schema.mentions, user_mention_instance))
 
     # Tag
@@ -422,11 +431,12 @@ def add_triples_for_one_tweet(g, row, entities_dict):
     # Topic.
     if not np.isnan(row['prim_topic']):
         prim_topic = row['prim_topic']
-        g.add((instance, dc.subject, Literal(prim_topic)))
+        topic_instance = URIRef(MGKB + f'topic_{prim_topic}')
+        g.add((instance, dc.subject, topic_instance))
 
     # nee:Entity
     ent_mentions = [literal_eval(v) for e, v in row_dict.items() if e.startswith('entity_') if str(v) != 'nan']
-    ### entity mention dict
+    # entity mention dict
     if len(ent_mentions) > 0:
         ents_mention_dict = {'em' + idx + '_' + str(entid): mention for entid, mention in enumerate(ent_mentions)}
         for entid, ent in ents_mention_dict.items():
@@ -506,16 +516,31 @@ def add_triples_for_one_tweet(g, row, entities_dict):
 
     # economic indicators
     if not np.isnan(year):
-        tur_instance = URIRef(MGKB + 'tur_' + country_code + '_' + str(year))
-        yur_instance = URIRef(MGKB + 'yur_' + country_code + '_' + str(year))
+        lt_unemployment_instance = URIRef(MGKB + 'long-term_unemployment_' + country_code + '_' + str(year))
+        youth_unemployment_instance = URIRef(MGKB + 'youth_unemployment_' + country_code + '_' + str(year))
+        total_unemployment_instance = URIRef(MGKB + 'total_unemployment_' + country_code + '_' + str(year))
+        income_instance = URIRef(MGKB + 'income_' + country_code + '_' + str(year))
         rgdpr_instance = URIRef(MGKB + 'rgdpr_' + country_code + '_' + str(year))
 
-        g.add((instance, fibo_fnd_rel_rel.isCharacterizedBy, tur_instance))
-        g.add((instance, fibo_fnd_rel_rel.isCharacterizedBy, yur_instance))
+        g.add((instance, fibo_fnd_rel_rel.isCharacterizedBy, total_unemployment_instance))
+        g.add((instance, fibo_fnd_rel_rel.isCharacterizedBy, youth_unemployment_instance))
+        g.add((instance, fibo_fnd_rel_rel.isCharacterizedBy, lt_unemployment_instance))
+        g.add((instance, fibo_fnd_rel_rel.isCharacterizedBy, income_instance))
         g.add((instance, fibo_fnd_rel_rel.isCharacterizedBy, rgdpr_instance))
 
 
 if __name__ == '__main__':
+    with open("../topic_modeling/topic_words/topicwords_50.json") as f:
+        topic_dict = json.load(f)
+    with open('../data/extracted/entities_dict_extracted_20210810.json') as file:
+        entities_dict = json.load(file)
+
+    define_topics(topic_dict)
+    define_entity_resources(entities_dict)
+    get_unemployment_rate()
+    get_income()
+    get_real_gdpr()
+
     df = pd.read_csv('../data/input/df_50_tm_sentiment_hsd_entities.csv', low_memory=False)
     df.dropna(subset=['created_at'], inplace=True)
     df.dropna(subset=['country_code'], inplace=True)
@@ -531,14 +556,7 @@ if __name__ == '__main__':
 
         now = datetime.now()
         date_time = now.strftime("%m%d%Y_%H%M%S")
-        with open('../data/extracted/entities_dict_extracted_20210810.json') as file:
-            entities_dict = json.load(file)
 
-        ## entity resources
-        define_entity_resources(entities_dict)
-        get_unemployment_rate()
-        get_income()
-        get_real_gdpr()
 
         count = 0
         for idx, row in df_year.iterrows():
