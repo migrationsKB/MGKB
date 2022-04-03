@@ -102,6 +102,7 @@ def define_topics(topic_dict):
         topic_words = ",".join(topic_words_ls)
         topic_instance = URIRef(MGKB + f'topic_{topic_id}')
         g.add((topic_instance, RDF.type, sioc_t.Category))
+        g.add((topic_instance, sioc.id, Literal(topic_id)))
         g.add((topic_instance, RDFS.label, Literal(topic_words)))
 
 
@@ -132,12 +133,14 @@ def get_unemployment_rate():
     lt_duration = URIRef(MGKB + 'long-term_unemployment_duration')
     g.add((lt_duration, RDF.type, fibo_fnd_dt_fd.Duration))
     g.add((lt_duration, fibo_fnd_dt_fd.hasDurationValue, Literal("12 months and more")))
-
+    print("long term unemployment rate ...")
     for year in years:
         for country in countries:
             rate = lt_unemployment.loc[(lt_unemployment["year"] == year) & (lt_unemployment["country_code"] == country)]["lt_unemployment"]
             if len(rate) > 0:
                 rate = round(float(rate), 1)
+                print(year, country, rate)
+
                 lt_unemployment_instance = URIRef(MGKB + 'long-term_unemployment_' + country + '_' + str(year))
                 g.add((lt_unemployment_instance, RDF.type, mgkb.LongTermUnemploymentRate))  # instance
                 g.add((lt_unemployment_instance, fibo_fnd_utl_alx.hasArgument,
@@ -159,12 +162,14 @@ def get_unemployment_rate():
     youth_unemployment_date_uk_instance = URIRef(MGKB + 'youth_unemployment_UK_report_date')  # rgdpr eurostat
     g.add((youth_unemployment_date_uk_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
     g.add((youth_unemployment_date_uk_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2022-03-15')))
-
+    print("youth unemployment rate ...")
     for year in years:
         for country in countries:
             rate = yt_unemployment.loc[(yt_unemployment["year"] == year) & (yt_unemployment["country_code"] == country)]["youth_unemployment"]
             if len(rate) > 0:
                 rate = round(float(rate), 1)
+                print(year, country, rate)
+
                 youth_unemployment_instance = URIRef(MGKB + 'youth_unemployment_' + country + '_' + str(year))
                 g.add((youth_unemployment_instance, RDF.type, mgkb.YouthUnemploymentRate))
                 g.add((youth_unemployment_instance, fibo_fnd_utl_alx.hasArgument,
@@ -199,13 +204,15 @@ def get_unemployment_rate():
         MGKB + 'total_unemployment_uk_report_date')  # total unemployment eurostat
     g.add((total_unemployment_date_uk_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
     g.add((total_unemployment_date_uk_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2022-03-15')))
-
+    print("total unemployment rate ...")
     for year in years:
         for country in countries:
             rate = total_unemployment.loc[
                 (total_unemployment["year"] == year) & (total_unemployment["country_code"] == country)]["total_unemployment"]
             if len(rate) > 0:
                 rate = round(float(rate), 1)
+                print(year, country, rate)
+
 
                 total_unemployment_instance = URIRef(MGKB + 'total_unemployment_' + country + '_' + str(year))
                 g.add((total_unemployment_instance, RDF.type, mgkb.TotalUnemploymentRate))
@@ -248,6 +255,7 @@ def get_income():
     currency_instance_uk = URIRef(MGKB + 'currency_pound')
     g.add((currency_instance_uk, RDF.type, fibo_fnd_acc_cat.Currency))
     g.add((currency_instance_uk, lcc_lr.hasName, Literal("Pound sterling")))
+    print("populating  income information ...")
 
     for year in years:
         for country in countries:
@@ -255,6 +263,7 @@ def get_income():
 
             if len(rate) > 0:
                 rate = round(int(rate))
+                print(year, country, rate)
 
                 income_instance = URIRef(MGKB + 'income_' + country + '_' + str(year))
                 g.add((income_instance, RDF.type, mgkb.DisposableIncome))  # type DisposableIncome
@@ -288,13 +297,14 @@ def get_real_gdpr(file="../data/uk_eu/real_gdpr.csv"):
     rgdpr_report_date_eurostat_instance = URIRef(MGKB + 'rgdpr_eurostat_report_date')  # rgdpr eurostat
     g.add((rgdpr_report_date_eurostat_instance, RDF.type, fibo_fnd_dt_fd.ExplicitDate))
     g.add((rgdpr_report_date_eurostat_instance, fibo_fnd_dt_fd.hasDateValue, Literal('2022-01-27')))
-
+    print("populating real gdp growth rate....")
     for year in years:
         for country in countries:
             # check the year
             rate = rgdpr.loc[(rgdpr["year"] == year) & (rgdpr["country_code"] == country)]["real_gdp_r"]
             if len(rate) > 0:
                 rate = round(float(rate), 1)
+                print(year, country, rate)
                 # gdpr instance.
                 rgdpr_instance = URIRef(MGKB + 'rgdpr_' + country + '_' + str(year))
                 # the instance is instantiated GrossDomesticProduct
@@ -486,35 +496,35 @@ def add_triples_for_one_tweet(g, row, entities_dict):
 
 
 if __name__ == '__main__':
-    with open("../topic_modeling/topic_words/topicwords_50.json") as f:
-        topic_dict = json.load(f)
-    with open('../data/extracted/extracted_entities/wiki2wikidata_entities_18032022.json') as file:
-        entities_dict = json.load(file)
+    # with open("../topic_modeling/topic_words/topicwords_50.json") as f:
+    #     topic_dict = json.load(f)
+    # with open('../data/extracted/extracted_entities/wiki2wikidata_entities_18032022.json') as file:
+    #     entities_dict = json.load(file)
 
-    define_topics(topic_dict)
-    define_entity_resources(entities_dict)
+    # define_topics(topic_dict)
+    # define_entity_resources(entities_dict)
     get_unemployment_rate()
     get_income()
     get_real_gdpr()
 
-    df = pd.read_csv('../data/input/df_50_tm_sentiment_hsd_entities.csv', low_memory=False)
-    df.dropna(subset=['created_at'], inplace=True)
-    df.dropna(subset=['country_code'], inplace=True)
-    df = df[df['topic_immig_max_score'] > 0.45]
+    # df = pd.read_csv('../data/input/df_50_tm_sentiment_hsd_entities.csv', low_memory=False)
+    # df.dropna(subset=['created_at'], inplace=True)
+    # df.dropna(subset=['country_code'], inplace=True)
+    # df = df[df['topic_immig_max_score'] > 0.45]
+    #
+    # df['Year'] = [int(x) for x in df['created_at'].str.slice(stop=4)]  # 200k
+    # # df = df[df['Year'] == 2021]
+    # # print(f'len of df: {len(df_year)}')  # 307339
+    # # df = df.sample(10)
+    # print(f"len of df {len(df)}")
+    #
+    # # now = datetime.now()
+    # # date_time = now.strftime("%m%d%Y_%H%M%S")
+    #
+    # count = 0
+    # for idx, row in df.iterrows():
+    #     add_triples_for_one_tweet(g, row, entities_dict)
+    #     count += 1
+    # print(f"{count}\r")
 
-    df['Year'] = [int(x) for x in df['created_at'].str.slice(stop=4)]  # 200k
-    # df = df[df['Year'] == 2021]
-    # print(f'len of df: {len(df_year)}')  # 307339
-    # df = df.sample(10)
-    print(f"len of df {len(df)}")
-
-    # now = datetime.now()
-    # date_time = now.strftime("%m%d%Y_%H%M%S")
-
-    count = 0
-    for idx, row in df.iterrows():
-        add_triples_for_one_tweet(g, row, entities_dict)
-        count += 1
-    print(f"{count}\r")
-
-    g.serialize(destination=f"output/migrationsKB.xml", format="xml")
+    g.serialize(destination=f"output/migrationsKB_indicators.xml", format="xml")
