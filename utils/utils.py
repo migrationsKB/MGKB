@@ -2,6 +2,7 @@ import os
 import yaml
 import json
 from glob import glob
+from itertools import islice
 
 
 def load_keywords_for_lang(input_dir, lang):
@@ -13,6 +14,12 @@ def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
+
+
+def chunks_dictionary(data, SIZE=100):
+    it = iter(data)
+    for i in range(0, len(data), SIZE):
+        yield {k: data[k] for k in islice(it, SIZE)}
 
 
 def get_keywords_by_category(category_dir='data/extracted/1st_round/hashtags_categories'):

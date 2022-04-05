@@ -152,20 +152,20 @@ Update: the statistics for the latest version of MGKB:
 `data/uk_eu/`, including income, long-term unemployment rate, total unemployment rate, youth unemployment rate and real GDP
 growth rate.
 
-### 8. Topics from topic modeling
+### 8. Topics 
 * Filter the tweets with refined topics.
   * relevant topics: 
     * [ 0,1,2,3,5,8,12,13,15,16,18,22,24,25, 29,32,34,36,41,42,45,47,48]
   * [topics and topic words](https://github.com/migrationsKB/MGKB/tree/master/topic_modeling/topic_words)
   
 
-### 8. KB population
+### 9. KB population
 * Populate Knowledge Base
   * `python 01_populate_kb.py`
 * Convert xml file to nt file:
   * `python 03_converter.py`
 
-### 9. Factor Analysis
+### 10. Factor Analysis
 * The dataset for factor analysis:
   * `data/corr/working_dataset.csv`
 
