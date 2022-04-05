@@ -8,7 +8,7 @@
 
 
 ## Links
-* 📂 pretrained DL models and nt files for **MGKB** can be found on [Zenodo](https://zenodo.org/record/5206820#.YRqF1nUza0o)
+* 📂 Wikipedia/wikidata entities files and nt files for **MGKB** can be found on [Zenodo](https://zenodo.org/record/5206820#.YRqF1nUza0o)
 * 🕸️ [Website](https://migrationskb.github.io/MGKB/) for statistics and examples of SPARQL queries
 * 📃 preprint: Yiyi Chen, Harald Sack, Mehwish Alam, **MigrationsKB: A Knowledge Base of Public Attitudes towards Migrations and their Driving Factors**
   ([https://arxiv.org/abs/2108.07593](https://arxiv.org/abs/2108.07593))
